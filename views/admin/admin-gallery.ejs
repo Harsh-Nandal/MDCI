@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit MDCI Gallery</title>
+
+    <!-- Bootstrap 4 -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Summernote (optional) -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet" />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      body {
+        background: #f8f9fa;
+        width: 80%;
+        margin: auto;
+      }
+      .form-section {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 3rem;
+        border: 1px solid #e3e3e3;
+      }
+      .form-group label {
+        font-weight: 600;
+      }
+      .btn {
+        border-radius: 20px;
+      }
+      .gallery-title {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      .card img {
+        height: 180px;
+        object-fit: cover;
+        border-bottom: 1px solid #ddd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <br />
+    <h1 class="gallery-title">Edit MDCI Gallery Section</h1>
+
+    <!-- Upload Form -->
+    <div class="form-section">
+      <h3>Upload New MDCI Gallery Images</h3>
+      <form
+        action="/admin-gallery"
+        method="POST"
+        enctype="multipart/form-data"
+        id="mdciGalleryImageUploadForm"
+      >
+        <div id="image-input-container" class="form-group">
+          <label>Select image(s):</label>
+          <input
+            type="file"
+            name="image"
+            class="form-control mb-2"
+            accept="image/*"
+            required
+          />
+        </div>
+        <button type="button" class="btn btn-secondary mb-3" onclick="addImageInput()">Add More Images</button>
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </form>
+      <small class="text-muted">You can upload up to 10 images at once.</small>
+    </div>
+
+    <!-- Show Uploaded Images -->
+    <div class="form-section">
+      <h3>Uploaded MDCI Gallery Images</h3>
+      <% if (galleryImages && galleryImages.length > 0) { %>
+      <div class="row">
+        <% galleryImages.forEach(image => { %>
+        <div class="col-md-3 mb-4">
+          <div class="card h-100 shadow-sm">
+            <img
+              src="<%= image.imagePath %>"
+              class="card-img-top"
+              alt="MDCI Gallery Image"
+            />
+            <div class="card-body text-center">
+              <form
+                action="/delete-admin-image/<%= image._id %>"
+                method="POST"
+                onsubmit="return confirm('Delete this image?');"
+              >
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <% } else { %>
+      <p>No MDCI gallery images uploaded yet.</p>
+      <% } %>
+    </div>
+
+    <a href="/" class="btn btn-secondary mt-4">Back to Home</a>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+
+    <script>
+      function addImageInput() {
+        const container = document.getElementById('image-input-container');
+        const inputs = container.querySelectorAll('input[type="file"]');
+        if (inputs.length >= 10) {
+          Swal.fire('Limit Reached', 'You can upload up to 10 images only.', 'warning');
+          return;
+        }
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'image';
+        input.accept = 'image/*';
+        input.className = 'form-control mb-2';
+        container.appendChild(input);
+      }
+    </script>
+  </body>
+</html>

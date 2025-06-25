@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Image</title>
+
+    <!-- Bootstrap 4 Only -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Summernote CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      body {
+        background: #f8f9fa;
+        width: 80%;
+        margin-left: 10%;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #343a40;
+      }
+      .form-section {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 3rem;
+        border: 1px solid #e3e3e3;
+      }
+      .form-group label {
+        font-weight: 600;
+      }
+      .btn {
+        border-radius: 20px;
+      }
+      .btn-primary {
+        min-width: 130px;
+      }
+      .form-floating-label {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-floating-label {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .form-floating-label textarea {
+        width: 100%;
+        padding: 1.2rem 0.75rem 0.4rem 0.75rem;
+        font-size: 0.95rem;
+        border: 2px solid #1a73e8;
+        border-radius: 5px;
+        resize: vertical;
+        line-height: 1.3;
+        min-height: 60px; /* adjust to make it compact */
+      }
+
+      .form-floating-label label {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        background: white;
+        padding: 0 4px;
+        color: #1a73e8;
+        font-size: 0.85rem;
+        pointer-events: none;
+        transition: 0.2s ease;
+      }
+
+      .form-floating-label textarea:focus + label,
+      .form-floating-label textarea:not(:placeholder-shown) + label {
+        top: -10px;
+        left: 10px;
+        font-size: 0.75rem;
+        background: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <br />
+    <h1>Edit the Privacy Policy Section</h1>
+    <br />
+
+    <!-- Section: Top Content Contact -->
+    <div class="form-section">
+      <form action="/update-content" method="POST">
+        <input type="hidden" name="section" value="privacyPolicySection" />
+        <input type="hidden" name="redirectTo" value="/admin-privacyPolicy" />
+        <label for="editor-privacyPolicySection">Top Contact Content</label>
+        <textarea
+          id="editor-privacyPolicySection"
+          name="content"
+          class="form-control"
+        >
+<%= privacyPolicySection %></textarea
+        >
+        <button type="submit" class="btn btn-success mt-2">
+          Update Above Form Content
+        </button>
+      </form>
+    </div>
+
+
+    <br /><br />
+
+    <!-- Section: Meta Title -->
+    <div class="form-section">
+      <form action="/update-content" method="POST">
+        <input type="hidden" name="section" value="privacyPolicyMetaHeading" />
+        <input type="hidden" name="redirectTo" value="/admin-privacyPolicy" />
+        <div class="form-floating-label">
+          <textarea
+            id="editor-privacyPolicyMetaHeading"
+            name="content"
+            class="form-control"
+            placeholder=" "
+          >
+<%= privacyPolicyMetaHeading %></textarea
+          >
+          <label for="editor-privacyPolicyMetaHeading">Meta Title</label>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">
+          Update Above Form Content
+        </button>
+      </form>
+    </div>
+
+    <!-- Section: Meta Description -->
+    <div class="form-section">
+      <form action="/update-content" method="POST">
+        <input type="hidden" name="section" value="privacyPolicyMetaDescription" />
+        <input type="hidden" name="redirectTo" value="/admin-privacyPolicy" />
+        <div class="form-floating-label">
+          <textarea
+            id="editor-privacyPolicyMetaDescription"
+            name="content"
+            class="form-control"
+            placeholder=" "
+          >
+<%= privacyPolicyMetaDescription %></textarea
+          >
+          <label for="editor-privacyPolicyMetaDescription">Meta Description</label>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">
+          Update Above Form Content
+        </button>
+      </form>
+    </div>
+
+    <!-- Section: Meta Keywords -->
+    <div class="form-section">
+      <form action="/update-content" method="POST">
+        <input type="hidden" name="section" value="privacyPolicyMetaKeyword" />
+        <input type="hidden" name="redirectTo" value="/admin-privacyPolicy" />
+        <div class="form-floating-label">
+          <textarea
+            id="editor-privacyPolicyMetaKeyword"
+            name="content"
+            class="form-control"
+            placeholder=" "
+          >
+<%= privacyPolicyMetaKeyword %></textarea
+          >
+          <label for="editor-privacyPolicyMetaKeyword">Meta Keyword</label>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">
+          Update Above Form Content
+        </button>
+      </form>
+    </div>
+    <a href="/" class="btn btn-secondary mt-4">Back to Home</a>
+
+    <!-- Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+
+    <!-- Summernote Init Script -->
+    <script src="/js/script.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Initialize editors
+
+        $("#editor-privacyPolicySection").summernote({
+          height: 400,
+        });
+      });
+    </script>
+  </body>
+</html>

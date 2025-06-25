@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head') %>
+    <style>
+      .form-row { display: flex; gap: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2>Edit Course - <%= university.name %></h2>
+
+      <form
+        action="/admin/university/<%= university._id %>/courses/edit/<%= index %>"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input
+          name="offeredCourseText"
+          placeholder="Offered Course Text"
+          class="form-control mb-2"
+          value="<%= course.offeredCourseText %>"
+          required
+        />
+        <input
+          name="viewLink"
+          placeholder="View Link"
+          class="form-control mb-2"
+          value="<%= course.viewLink %>"
+        />
+        <input
+          name="courseName"
+          placeholder="Course Name"
+          class="form-control mb-2"
+          value="<%= course.course.name %>"
+          required
+        />
+        <input
+          name="duration"
+          placeholder="Duration"
+          class="form-control mb-2"
+          value="<%= course.course.duration %>"
+        />
+
+        <!-- Topics -->
+        <label><strong>Topics</strong></label>
+        <div id="edit-topic-container">
+          <% if (course.course.topics && course.course.topics.length) { %>
+            <% course.course.topics.forEach(function(topic, index) { %>
+              <div class="form-row mb-2">
+                <div class="col">
+                  <input
+                    type="text"
+                    name="topics[]"
+                    class="form-control"
+                    value="<%= topic %>"
+                  />
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <!-- In case there are no topics, provide an empty input -->
+            <div class="form-row mb-2">
+              <div class="col">
+                <input
+                  type="text"
+                  name="topics[]"
+                  class="form-control"
+                  placeholder="Enter a topic"
+                />
+              </div>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Add more topics button (optional) -->
+        <button type="button" class="btn btn-sm btn-info mb-3" onclick="addTopicInput()">Add More Topic</button>
+
+        <p>Current Image:</p>
+        <img src="<%= course.course.image %>" height="100" class="mb-2" />
+        <input
+          type="file"
+          name="courseImage"
+          class="form-control mb-2"
+        />
+
+        <button class="btn btn-primary">Update Course</button>
+        <a href="/admin/university/<%= university._id %>/courses" class="btn btn-secondary ml-2">Cancel</a>
+      </form>
+    </div>
+
+    <script>
+      function addTopicInput() {
+        const container = document.getElementById("edit-topic-container");
+        const div = document.createElement("div");
+        div.className = "form-row mb-2";
+        div.innerHTML = `
+          <div class="col">
+            <input type="text" name="topics[]" class="form-control" placeholder="Enter a topic" />
+          </div>
+        `;
+        container.appendChild(div);
+      }
+    </script>
+  </body>
+</html>

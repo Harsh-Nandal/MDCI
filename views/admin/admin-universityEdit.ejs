@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head') %>
+    <style>
+      #addForm {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2>Edit University</h2>
+      <form action="/admin/edit-university/<%= university._id %>" method="POST">
+        <div class="form-group">
+          <label>Name</label>
+          <input
+            type="text"
+            name="name"
+            value="<%= university.name %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <input
+            type="number"
+            step="0.1"
+            name="rating"
+            value="<%= university.rating %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Enrolled</label>
+          <input
+            type="number"
+            name="enrolled"
+            value="<%= university.enrolled %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input
+            type="text"
+            name="location"
+            value="<%= university.location %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Established Year</label>
+          <input
+            type="number"
+            name="stablishedYear"
+            value="<%= university.stablishedYear %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Timing Content</label>
+          <textarea name="timingContent" class="form-control">
+<%= university.timingContent %></textarea
+          >
+        </div>
+        <div class="form-group">
+          <label>Brief Content</label>
+          <textarea name="briefContent" class="form-control">
+<%= university.briefContent %></textarea
+          >
+        </div>
+        <div class="form-group">
+          <label>About Content</label>
+          <textarea name="aboutContent" class="form-control">
+<%= university.aboutContent %></textarea
+          >
+        </div>
+        <div class="form-group">
+          <label>Meta Title</label>
+          <input
+            type="text"
+            name="metaTitle"
+            value="<%= university.metaTitle %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Meta Description</label>
+          <input
+            type="text"
+            name="metaDescription"
+            value="<%= university.metaDescription %>"
+            class="form-control"
+          />
+        </div>
+        <div class="form-group">
+          <label>Meta Keyword</label>
+          <input
+            type="text"
+            name="metaKeyword"
+            value="<%= university.metaKeyword %>"
+            class="form-control"
+          />
+        </div>
+        <button type="submit" class="btn btn-success">Update</button>
+        <a href="/admin/universities" class="btn btn-secondary">Back</a>
+      </form>
+    </div>
+  </body>
+</html>

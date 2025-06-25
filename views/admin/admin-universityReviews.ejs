@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head') %>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2>Reviews - <%= university.name %></h2>
+
+      <!-- Add Review Form -->
+      <form action="/admin/university/<%= university._id %>/reviews" method="POST" enctype="multipart/form-data">
+        <input name="reviewText" placeholder="Review Summary" class="form-control mb-2" required />
+        <input name="name" placeholder="Reviewer Name" class="form-control mb-2" required />
+        <input name="rating" type="number" placeholder="Rating (1-5)" min="1" max="5" class="form-control mb-2" required />
+        <textarea name="review" placeholder="Review Content" class="form-control mb-2" required></textarea>
+        <input type="file" name="image" class="form-control mb-2" />
+        <button class="btn btn-warning">Add Review</button>
+      </form>
+
+      <hr />
+
+      <!-- Display Existing Reviews -->
+      <h4>Existing Reviews</h4>
+      <% if (university.reviews && university.reviews.length > 0) { %>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Summary</th>
+              <th>Name</th>
+              <th>Rating</th>
+              <th>Image</th>
+              <th>Review</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% university.reviews.forEach((item, index) => { %>
+              <tr>
+                <td><%= item.reviewText %></td>
+                <td><%= item.review.name %></td>
+                <td><%= item.review.rating %></td>
+                <td>
+                  <% if (item.review.image) { %>
+                    <img src="<%= item.review.image %>" height="40" />
+                  <% } else { %>
+                    No Image
+                  <% } %>
+                </td>
+                <td><%= item.review.review %></td>
+                <td>
+                  <form action="/admin/university/<%= university._id %>/reviews/delete/<%= index %>" method="POST">
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure to delete this review?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p>No reviews added yet.</p>
+      <% } %>
+    </div>
+  </body>
+</html>

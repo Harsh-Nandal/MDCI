@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fees Details</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- DataTables CSS & Buttons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"
+    />
+
+    <!-- JS Libraries -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
+
+    <script>
+      function calculateFees() {
+        const total =
+          parseFloat(document.getElementById("totalFees").value) || 0;
+        const discountPercent =
+          parseFloat(document.getElementById("discountPercent").value) || 0;
+        const discountAmount = (total * discountPercent) / 100;
+        const finalAmount = total - discountAmount;
+
+        document.getElementById("discountAmount").value =
+          discountAmount.toFixed(2);
+        document.getElementById("finalAmount").value = finalAmount.toFixed(2);
+        document.getElementById("dues").value = finalAmount.toFixed(2);
+      }
+
+      function updateDues() {
+        const final =
+          parseFloat(document.getElementById("finalAmount").value) || 0;
+        const paid =
+          parseFloat(document.getElementById("amountPaid").value) || 0;
+        const dues = final - paid;
+        document.getElementById("dues").value = dues.toFixed(2);
+      }
+
+      window.onload = function () {
+        calculateFees();
+        updateDues();
+      };
+    </script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h3>Fees for <%= student.name %></h3>
+      <form action="/admin/student/<%= student._id %>/fees" method="POST">
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Total Fees</label>
+            <input
+              type="number"
+              name="totalFees"
+              id="totalFees"
+              class="form-control"
+              required
+              value="<%= student.fees?.totalFees || '' %>"
+              oninput="calculateFees()"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label>Discount (%)</label>
+            <input
+              type="number"
+              name="discountPercent"
+              id="discountPercent"
+              class="form-control"
+              value="<%= student.fees?.discountPercent || '' %>"
+              oninput="calculateFees()"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label>Discount Amount</label>
+            <input
+              type="number"
+              name="discountAmount"
+              id="discountAmount"
+              class="form-control"
+              readonly
+              value="<%= student.fees?.discountAmount || '' %>"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Final Amount</label>
+            <input
+              type="number"
+              name="finalAmount"
+              id="finalAmount"
+              class="form-control"
+              readonly
+              value="<%= student.fees?.finalAmount || '' %>"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label>Amount Paid</label>
+            <input
+              type="number"
+              name="amountPaid"
+              id="amountPaid"
+              class="form-control"
+              value="<%= student.fees?.amountPaid || '' %>"
+              oninput="updateDues()"
+            />
+          </div>
+          <div class="form-group col-md-4">
+            <label>Dues</label>
+            <input
+              type="number"
+              name="dues"
+              id="dues"
+              class="form-control"
+              readonly
+              value="<%= student.fees?.dues || '' %>"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Last Paid Date</label>
+          <input
+            type="date"
+            name="lastPaidDate"
+            class="form-control"
+            value="<%= student.fees?.lastPaidDate ? student.fees.lastPaidDate.toISOString().split('T')[0] : '' %>"
+          />
+        </div>
+
+        <div class="form-group col-md-4">
+          <label>Receipt No</label>
+          <input
+            type="text"
+            name="receiptNo"
+            id="receiptNo"
+            class="form-control"
+            value="<%= student.fees?.receiptNo || '' %>"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Fees</button>
+        <a href="/admin/student/enroll" class="btn btn-secondary">Back</a>
+      </form>
+
+      <%
+  let allInstallments = [];
+  const installments = student.fees?.installments || [];
+  const amountPaid = student.fees?.amountPaid || 0;
+  const lastDate = student.fees?.lastPaidDate;
+  const lastReceipt = student.fees?.receiptNo;
+
+  // Push saved installments
+  if (installments.length) {
+    installments.forEach(inst => allInstallments.push(inst));
+  }
+
+  // If only one installment should match amountPaid
+  if (installments.length === 1) {
+    allInstallments = [{
+      amount: amountPaid,
+      date: lastDate,
+      receiptNo: lastReceipt
+    }];
+  }
+
+  // If more than one installment, calculate new payment delta
+  else if (installments.length > 1 && lastDate && lastReceipt) {
+    const savedTotal = installments.reduce((sum, inst) => sum + inst.amount, 0);
+const latestAmount = amountPaid - savedTotal;
+if (latestAmount > 0) {
+  allInstallments.push({ amount: latestAmount, date: lastDate, receiptNo: lastReceipt });
+}
+
+  }
+%>
+
+<% if (allInstallments.length) { %>
+  <h4 class="mt-5">Installment History</h4>
+  <table id="installmentTable" class="table table-bordered display nowrap w-100">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Receipt No</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% allInstallments.forEach((inst, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td>₹<%= inst.amount %></td>
+          <td><%= new Date(inst.date).toLocaleDateString() %></td>
+          <td><%= inst.receiptNo %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <script>
+    $(function () {
+      $('#installmentTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'excel', 'pdf', 'print'],
+        scrollX: true
+      });
+    });
+  </script>
+<% } %>
+
+
+    </div>
+  </body>
+</html>

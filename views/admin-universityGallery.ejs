@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('partials/head') %>
+    <style>
+      .file-input-group {
+        margin-bottom: 10px;
+      }
+      .preview-img {
+        max-height: 150px;
+        margin: 5px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+    </style>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+
+  <body>
+    <div class="container mt-5">
+      <h2>Gallery - <%= university.name %></h2>
+
+      <!-- Upload Form -->
+      <form
+        action="/admin/university/<%= university._id %>/gallery"
+        method="POST"
+        enctype="multipart/form-data"
+        id="galleryForm"
+      >
+        <div id="fileInputs">
+          <div class="file-input-group">
+            <input
+              type="file"
+              name="galleryImages"
+              class="form-control-file"
+              onchange="previewImage(this)"
+              required
+            />
+            <div class="image-preview"></div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="addFileInput()"
+        >
+          Add More Images
+        </button>
+        <button class="btn btn-primary mt-2" type="submit">
+          Upload Images
+        </button>
+      </form>
+
+      <hr />
+      <h4>Existing Gallery Images</h4>
+      <div class="row">
+        <% university.gallery.forEach((img, index) => { %>
+        <div class="col-md-3 text-center mb-4">
+          <div class="card shadow-sm" style="height: 200px; overflow: hidden">
+            <img
+              src="<%= img %>"
+              class="w-100 h-100"
+              style="object-fit: cover; border-radius: 8px"
+              alt="Gallery Image"
+            />
+          </div>
+          <form
+            action="/admin/university/<%= university._id %>/gallery/delete/<%= index %>"
+            method="POST"
+            onsubmit="return confirmDelete(event)"
+            class="mt-2"
+          >
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <script>
+      let fileInputCount = 1;
+      const maxInputs = 10;
+
+      function addFileInput() {
+        if (fileInputCount >= maxInputs) {
+          alert("You can upload a maximum of 10 images.");
+          return;
+        }
+
+        const container = document.getElementById("fileInputs");
+        const newGroup = document.createElement("div");
+        newGroup.className = "file-input-group";
+        newGroup.innerHTML = `
+          <input type="file" name="galleryImages" class="form-control-file" onchange="previewImage(this)" required />
+          <div class="image-preview"></div>
+        `;
+        container.appendChild(newGroup);
+        fileInputCount++;
+      }
+
+      function previewImage(input) {
+        const previewDiv = input.nextElementSibling;
+        previewDiv.innerHTML = ""; // clear previous
+
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.className = "preview-img";
+            previewDiv.appendChild(img);
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+
+      function confirmDelete(event) {
+        event.preventDefault(); // Stop form submit
+
+        Swal.fire({
+          title: "Are you sure?",
+          text: "This image will be permanently deleted.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            event.target.submit(); // Submit form if confirmed
+          }
+        });
+
+        return false;
+      }
+    </script>
+  </body>
+</html>

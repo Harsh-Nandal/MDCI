@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head') %>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h2>Courses - <%= university.name %></h2>
+
+      <!-- Add Course Form -->
+      <form
+        action="/admin/university/<%= university._id %>/courses"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input
+          name="offeredCourseText"
+          placeholder="Offered Course Text"
+          class="form-control mb-2"
+          required
+        />
+        <input
+          name="viewLink"
+          placeholder="View Link"
+          class="form-control mb-2"
+        />
+        <input
+          name="courseName"
+          placeholder="Course Name"
+          class="form-control mb-2"
+          required
+        />
+        <input
+          name="duration"
+          placeholder="Duration"
+          class="form-control mb-2"
+        />
+        <input
+          type="file"
+          name="courseImage"
+          required
+          class="form-control mb-2"
+        />
+        <button class="btn btn-success">Add Course</button>
+      </form>
+
+      <hr />
+      <h4>Existing Courses</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Text</th>
+            <th>Name</th>
+            <th>Duration</th>
+            <th>Image</th>
+            <th>Edit</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% university.courses.forEach((course, index) => { %>
+          <tr>
+            <td><%= course.offeredCourseText %></td>
+            <td><%= course.course.name %></td>
+            <td><%= course.course.duration %></td>
+            <td><img src="<%= course.course.image %>" height="40" /></td>
+            <td>
+              <% if (course.viewLink) { %>
+              <a
+                href="/admin/university/<%= university._id %>/courses/edit/<%= index %>"
+                class="btn btn-sm btn-warning"
+              >
+                Edit
+              </a>
+              <% } else { %> N/A <% } %>
+            </td>
+            <td>
+              <form
+                action="/admin/university/<%= university._id %>/courses/delete/<%= index %>"
+                method="POST"
+                onsubmit="return confirmDelete(event)"
+              >
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      function confirmDelete(event) {
+        event.preventDefault();
+
+        Swal.fire({
+          title: "Are you sure?",
+          text: "This course will be permanently deleted.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            event.target.submit();
+          }
+        });
+
+        return false;
+      }
+    </script>
+  </body>
+</html>
