@@ -1,25 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Enrollment</title>
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- DataTables CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"
-    />
-
-    <!-- SweetAlert2 CSS & JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('../partials/head') %>
 
     <style>
       .student-image {
@@ -136,233 +118,290 @@
     </style>
   </head>
   <body>
-    <div class="container mt-5">
-      <h2 class="mb-4">Student Enrollment</h2>
-      <button class="btn btn-primary mb-3" onclick="toggleForm()">
-        + Enroll New Student
-      </button>
-      <div id="enrollForm" style="display: none">
-        <div class="card mb-4">
-          <div class="card-header">New Student Form</div>
-          <div class="card-body">
-            <form
-              action="/student/enroll"
-              method="POST"
-              enctype="multipart/form-data"
-            >
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label for="regNo">Registration No</label>
-                  <input
-                    type="text"
-                    name="regNo"
-                    class="form-control"
-                    required
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="name">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    required
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="dob">Date of Birth</label>
-                  <input type="date" name="dob" class="form-control" required />
-                </div>
-                <!-- ✅ Course dropdown added -->
-                <div class="col-md-4 mb-3">
-                  <label for="course">Course</label>
-                  <select name="course" class="form-control" required>
-                    <option value="">Select Course</option>
-                    <% courses.forEach(course => { %>
-                    <option value="<%= course._id %>">
-                      <%= course.name %>
-                    </option>
-                    <% }) %>
-                  </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="gender">Gender</label>
-                  <select name="gender" class="form-control">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="email">Email</label>
-                  <input type="email" name="email" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="contactNo">Contact No</label>
-                  <input type="text" name="contactNo" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="aadharNo">Aadhar Number</label>
-                  <input type="text" name="aadharNo" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="bloodGroup">Blood Group</label>
-                  <input type="text" name="bloodGroup" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="fatherName">Father's Name</label>
-                  <input type="text" name="fatherName" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="fatherOccupation">Father's Occupation</label>
-                  <input
-                    type="text"
-                    name="fatherOccupation"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="motherName">Mother's Name</label>
-                  <input type="text" name="motherName" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="motherOccupation">Mother's Occupation</label>
-                  <input
-                    type="text"
-                    name="motherOccupation"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="parentsNo">Parents Phone No</label>
-                  <input type="text" name="parentsNo" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="qualification">Qualification</label>
-                  <input
-                    type="text"
-                    name="qualification"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="maritalStatus">Marital Status</label>
-                  <input
-                    type="text"
-                    name="maritalStatus"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="studentOccupation">Student Occupation</label>
-                  <input
-                    type="text"
-                    name="studentOccupation"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="dateOfAdmission">Date of Admission</label>
-                  <input
-                    type="date"
-                    name="dateOfAdmission"
-                    class="form-control"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="referenceBy">Reference By</label>
-                  <input type="text" name="referenceBy" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="address">Address</label>
-                  <textarea name="address" class="form-control"></textarea>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="password">Password</label>
-                  <input type="password" name="password" class="form-control" />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="image">Upload Photo</label>
-                  <input type="file" name="image" class="form-control-file" />
-                </div>
-              </div>
-              <button class="btn btn-success">Submit</button>
-            </form>
-          </div>
+    <%- include('../partials/sidebar') %>
+    <div class="dashboard-main-wrapper">
+      <div
+        class="top-navbar flex-between gap-16"
+        style="background-color: white"
+      >
+        <div class="flex-align gap-16">
+          <!-- Toggle Button Start -->
+          <button
+            type="button"
+            class="toggle-btn d-xl-none d-flex text-26 text-gray-500"
+          >
+            <i class="ph ph-list"></i>
+          </button>
+          <!-- Toggle Button End -->
+
+          <h1>Student Enrollment</h1>
+        </div>
+
+        <div class="flex-align gap-16">
+          <a
+            href="/admin/logout"
+            class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
+          >
+            <span class="text-2xl text-danger-600 d-flex"
+              ><i class="ph ph-sign-out"></i
+            ></span>
+            <span class="text">Log Out</span>
+          </a>
         </div>
       </div>
 
-      <!-- Styled Student List -->
-      <div class="card">
-        
-
-        <div class="card-header">All Students</div>
-        <div class="card-body">
-          <table id="studentTable"   class="table table-striped">
-            <thead>
-              <tr>
-                <th class="fixed-width">#</th>
-                <th class="h6 text-gray-300">Reg No</th>
-                <th class="h6 text-gray-300">Students</th>
-                <th class="h6 text-gray-300">Course</th>
-                <th class="h6 text-gray-300">DOB</th>
-                <th class="h6 text-gray-300">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% students.forEach((student, index) => { %>
-              <tr>
-                <td class="fixed-width"><%= index + 1 %></td>
-                <td><%= student.regNo %></td>
-                <td>
-                  <div class="flex-align gap-8">
-                    <% if (student.imagePath) { %>
-                    <img src="<%= student.imagePath %>" class="student-image" />
-                    <% } else { %>
-                    <img src="/default-profile.png" class="student-image" />
-                    <% } %>
-                    <span class="h6 mb-0 fw-medium text-gray-300">
-                      <%= student.name %>
-                    </span>
+      <div class="container mt-5">
+        <h2 class="mb-4">Student Enrollment</h2>
+        <button class="btn btn-primary mb-3" onclick="toggleForm()">
+          + Enroll New Student
+        </button>
+        <div id="enrollForm" style="display: none">
+          <div class="card mb-4">
+            <div class="card-header">New Student Form</div>
+            <div class="card-body">
+              <form
+                action="/student/enroll"
+                method="POST"
+                enctype="multipart/form-data"
+              >
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="regNo">Registration No</label>
+                    <input
+                      type="text"
+                      name="regNo"
+                      class="form-control"
+                      required
+                    />
                   </div>
-                </td>
-                <td>
-                  <span class="h6 mb-0 fw-medium text-gray-300">
-                    <%= student.course?.name || 'N/A' %>
-                  </span>
-                </td>
-                <td>
-                  <span class="h6 mb-0 fw-medium text-gray-300">
-                    <%= student.dob ? new Date(student.dob).toLocaleDateString()
-                    : '' %>
-                  </span>
-                </td>
-                <td class="text-center">
-                  <a
-                    href="/admin/student/edit/<%= student._id %>"
-                    class="btn btn-warning btn-sm mr-2"
-                    >Edit</a
-                  >
-                  <a
-                    href="/admin/student/<%= student._id %>/fees"
-                    class="btn btn-info btn-sm mr-2"
-                    >Fees</a
-                  >
+                  <div class="col-md-4 mb-3">
+                    <label for="name">Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="dob">Date of Birth</label>
+                    <input
+                      type="date"
+                      name="dob"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <!-- ✅ Course dropdown added -->
+                  <div class="col-md-4 mb-3">
+                    <label for="course">Course</label>
+                    <select name="course" class="form-control" required>
+                      <option value="">Select Course</option>
+                      <% courses.forEach(course => { %>
+                      <option value="<%= course._id %>">
+                        <%= course.name %>
+                      </option>
+                      <% }) %>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="gender">Gender</label>
+                    <select name="gender" class="form-control">
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="contactNo">Contact No</label>
+                    <input type="text" name="contactNo" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="aadharNo">Aadhar Number</label>
+                    <input type="text" name="aadharNo" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="bloodGroup">Blood Group</label>
+                    <input type="text" name="bloodGroup" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="fatherName">Father's Name</label>
+                    <input type="text" name="fatherName" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="fatherOccupation">Father's Occupation</label>
+                    <input
+                      type="text"
+                      name="fatherOccupation"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="motherName">Mother's Name</label>
+                    <input type="text" name="motherName" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="motherOccupation">Mother's Occupation</label>
+                    <input
+                      type="text"
+                      name="motherOccupation"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="parentsNo">Parents Phone No</label>
+                    <input type="text" name="parentsNo" class="form-control" />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="qualification">Qualification</label>
+                    <input
+                      type="text"
+                      name="qualification"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="maritalStatus">Marital Status</label>
+                    <input
+                      type="text"
+                      name="maritalStatus"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="studentOccupation">Student Occupation</label>
+                    <input
+                      type="text"
+                      name="studentOccupation"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="dateOfAdmission">Date of Admission</label>
+                    <input
+                      type="date"
+                      name="dateOfAdmission"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="referenceBy">Reference By</label>
+                    <input
+                      type="text"
+                      name="referenceBy"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="address">Address</label>
+                    <textarea name="address" class="form-control"></textarea>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="password">Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="image">Upload Photo</label>
+                    <input type="file" name="image" class="form-control-file" />
+                  </div>
+                </div>
+                <button class="btn btn-success">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
 
-                  <form
-                    action="/admin/student/delete/<%= student._id %>"
-                    method="POST"
-                    class="delete-form d-inline"
-                  >
-                    <button type="submit" class="btn btn-danger btn-sm">
-                      Delete
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
+        <!-- Styled Student List -->
+        <div class="card">
+          <div class="card-header">All Students</div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table id="studentTable" class="table table-striped">
+                <thead>
+                  <tr>
+                    <th class="fixed-width">#</th>
+                    <th class="h6 text-gray-300">Reg No</th>
+                    <th class="h6 text-gray-300">Students</th>
+                    <th class="h6 text-gray-300">Course</th>
+                    <th class="h6 text-gray-300">DOB</th>
+                    <th class="h6 text-gray-300">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% students.forEach((student, index) => { %>
+                  <tr>
+                    <td class="fixed-width"><%= index + 1 %></td>
+                    <td><%= student.regNo %></td>
+                    <td>
+                      <div class="flex-align gap-8">
+                        <% if (student.imagePath) { %>
+                        <img
+                          src="<%= student.imagePath %>"
+                          class="student-image"
+                          alt="Student Image"
+                        />
+                        <% } else { %>
+                        <img
+                          src="/default-profile.png"
+                          class="student-image"
+                          alt="Default Image"
+                        />
+                        <% } %>
+                        <span class="h6 mb-0 fw-medium text-gray-300">
+                          <%= student.name %>
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="h6 mb-0 fw-medium text-gray-300">
+                        <%= student.course?.name || 'N/A' %>
+                      </span>
+                    </td>
+                    <td>
+                      <span class="h6 mb-0 fw-medium text-gray-300">
+                        <%= student.dob ? new
+                        Date(student.dob).toLocaleDateString() : '' %>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <a
+                        href="/admin/student/edit/<%= student._id %>"
+                        class="btn btn-warning btn-sm mr-2 text-dark"
+                        >Edit</a
+                      >
+                      <a
+                        href="/admin/student/<%= student._id %>/fees"
+                        class="btn btn-info btn-sm mr-2 text-white"
+                        >Fees</a
+                      >
+
+                      <form
+                        action="/admin/student/delete/<%= student._id %>"
+                        method="POST"
+                        class="delete-form d-inline"
+                      >
+                        <button
+                          type="submit"
+                          class="btn btn-danger btn-sm text-white"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

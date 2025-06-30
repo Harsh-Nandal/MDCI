@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Edit Student</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <%- include('../partials/head') %>
   <style>
     body { background-color: #f8f9fa; }
     .page-header {
@@ -66,7 +63,36 @@
   </style>
 </head>
 <body>
-  <div class="container my-5">
+  <%- include('../partials/sidebar') %>
+<div class="dashboard-main-wrapper">
+  <div class="top-navbar flex-between gap-16" style="background-color: white">
+    <div class="flex-align gap-16">
+      <!-- Toggle Button Start -->
+      <button
+        type="button"
+        class="toggle-btn d-xl-none d-flex text-26 text-gray-500"
+      >
+        <i class="ph ph-list"></i>
+      </button>
+      <!-- Toggle Button End -->
+
+      <h1>Student Edit</h1>
+    </div>
+
+    <div class="flex-align gap-16">
+      <a
+        href="/admin/logout"
+        class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
+      >
+        <span class="text-2xl text-danger-600 d-flex"
+          ><i class="ph ph-sign-out"></i
+        ></span>
+        <span class="text">Log Out</span>
+      </a>
+    </div>
+  </div>
+
+<div class="container my-5">
     <h2 class="page-header">Edit Student</h2>
     
     <form action="/admin/student/edit/<%= student._id %>" method="POST" enctype="multipart/form-data">
@@ -219,5 +245,7 @@
       </div>
     </form>
   </div>
+</div>
+
 </body>
 </html>

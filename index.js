@@ -2,15 +2,53 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
-const multer = require("multer");
 const fs = require("fs");
-const { isAdminLoggedIn } = require("./middleware/authMiddleware");
+const multer = require("multer");
+const session = require("express-session");
+
+const connectDB = require("./connectDB");
+const protect = require("./middleware/authMiddleware");
 
 // Load environment variables
 dotenv.config();
 
-const app = express(); // ✅ Initialize app before any app.use
+const app = express();
 const port = process.env.PORT || 3000;
+
+// Connect to DB
+connectDB();
+
+// Ensure upload directory exists
+const uploadPath = path.join(__dirname, "public", "uploads", "placement");
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
+// Multer setup for placement images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadPath),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+});
+const upload = multer({ storage });
+
+// Session setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your_session_secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+// View engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Controllers
 const homeController = require("./controllers/homeController");
@@ -20,10 +58,10 @@ const brochureController = require("./controllers/brochureController");
 const placementImagesController = require("./controllers/PlacementImagesController");
 const termsConditionsController = require("./controllers/terms&conditionsController");
 const privacyPolicyController = require("./controllers/privacyPolicyController");
+
+// Route files
 const EnrollmentRoutes = require("./routes/enrollmentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
-// Routes
 const galleryRoutes = require("./routes/gallery");
 const educationRoutes = require("./routes/educationPartner");
 const studentRoutes = require("./routes/studentRoutes");
@@ -39,106 +77,63 @@ const courseRoutes = require("./routes/courseRoutes");
 const universityRoutes = require("./routes/universityRoutes");
 const bannerInquiryRoutes = require("./routes/bannerInquiryRoutes");
 
-// Middleware
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// === Routes ===
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// View engine setup
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-require("dotenv").config();
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB connected");
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-    process.exit(1); // Optional: stop app if DB fails
-  }
-};
-
-module.exports = connectDB;
-
-// Ensure upload path exists
-const uploadPath = path.join(__dirname, "public", "uploads", "placement");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-// Multer setup for placement images
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadPath),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
-});
-const upload = multer({ storage });
-
-// Routes
+// Static pages
 app.get("/", homeController.renderHomePage);
+app.get("/edit-page", protect, homeController.renderAdminPage);
 app.get("/aboutUs", aboutController.renderPageAboutUs);
-app.get("/edit-page", homeController.renderAdminPage);
-app.get("/admin-aboutUs", aboutController.renderAdminPageAboutUs);
+app.get("/admin-aboutUs", protect, aboutController.renderAdminPageAboutUs);
+app.get("/ourCourses", (req, res) => res.render("OurCourses"));
+app.get("/university/colleges", (req, res) => res.render("university"));
+app.get("/contact", (req, res) => res.render("contact"));
+app.get("/terms&conditions", termsConditionsController.getTermsConditionsSection);
+app.get("/privacyPolicy", privacyPolicyController.getprivacyPolicySection);
 
-app.use(aboutRoutes);
-app.use(contactRoutes);
-app.use("/", mdciGalleryRoutes);
-app.use("/", logoImageRoutes);
+// University detail pages
+app.get("/amityUniversity", (req, res) => res.render("amity_university"));
+app.get("/chitkaraUniversity", (req, res) => res.render("chitkara_university"));
+app.get("/kalingaUniversity", (req, res) => res.render("kalinga_university"));
+app.get("/manavRachnaUniversity", (req, res) => res.render("manav_rachna_university"));
+app.get("/vivekanandUniversity", (req, res) => res.render("vivekanand_university"));
+app.get("/LPUUniversity", (req, res) => res.render("LPU_university"));
 
-// Placement Partners Images
-app.post(
-  "/placement-image",
-  upload.array("image", 10),
-  placementImagesController.uploadPlacementImages
-);
+app.get("/gallery", (req, res) => res.render("gallery"));
+
+// Admin dashboard
+app.get("/admin/dashboard", protect, (req, res) => res.render("admin/dashboard"));
+
+// Placement Partner Images
+app.post("/placement-image", upload.array("image", 10), placementImagesController.uploadPlacementImages);
 app.post("/delete-image/:id", placementImagesController.deletePlacementImage);
 
-// Other Routes
+// Admin Terms & Privacy Policy Section
+app.get("/admin-terms&conditions", protect, termsConditionsController.getAdminTermsConditionsSection);
+app.get("/admin-privacyPolicy", protect, privacyPolicyController.getAdminprivacyPolicySection);
+
+// Update content
+app.post("/update-content", contentController.updateContent);
+
+// Use modular routes
+app.use("/admin/brochure", brochureController(upload, uploadPath));
+app.use("/", faqRoutes);
+app.use("/", mdciGalleryRoutes);
+app.use("/", logoImageRoutes);
 app.use("/", galleryRoutes);
 app.use("/", educationRoutes);
-app.use(studentReviewRoutes);
 app.use("/", placementStudentsRoutes);
 app.use("/", studentRoutes);
 app.use("/", eventRoutes);
 app.use("/", courseRoutes);
-app.use("/admin", universityRoutes);
 app.use("/", EnrollmentRoutes);
 app.use("/", bannerInquiryRoutes);
-app.use("/", adminRoutes);
+app.use("/admin", universityRoutes);
+app.use(aboutRoutes);
+app.use(contactRoutes);
+app.use(adminRoutes);
+app.use(studentReviewRoutes);
 
-// Content update
-app.post("/update-content", contentController.updateContent);
-
-// Terms and Conditions admin page routes
-app.get(
-  "/admin-terms&conditions",
-  termsConditionsController.getAdminTermsConditionsSection
-);
-app.get(
-  "/terms&conditions",
-  termsConditionsController.getTermsConditionsSection
-);
-
-// Privacy Policy admin page routes
-app.get(
-  "/admin-privacyPolicy",
-  privacyPolicyController.getAdminprivacyPolicySection
-);
-app.get("/privacyPolicy", privacyPolicyController.getprivacyPolicySection);
-
-// Brochure routes
-app.use("/admin/brochure", brochureController(upload, uploadPath));
-
-// FAQ routes
-app.use("/", faqRoutes);
-
-// Basic error handler
+// Error handler
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
   res.status(500).send("Something went wrong!");
@@ -146,5 +141,5 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`✅ Server running at http://localhost:${port}`);
 });

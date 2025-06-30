@@ -2,9 +2,11 @@
 const express = require("express");
 const router = express.Router();
 const BannerInquiry = require("../models/BannerInquiry");
+const protect = require("../middleware/authMiddleware");
+
 
 // View all inquiries
-router.get("/admin/counsel-list", async (req, res) => {
+router.get("/admin/counsel-list",protect, async (req, res) => {
   const inquiries = await BannerInquiry.find().sort({ createdAt: -1 });
   res.render("admin/counsel-list", { inquiries });
 });

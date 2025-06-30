@@ -4,6 +4,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const universityController = require("../controllers/universityController");
+const protect = require("../middleware/authMiddleware");
+
 
 // Multer setup with folder check
 const storage = multer.diskStorage({
@@ -26,14 +28,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // University routes
-router.get("/universities", universityController.getUniversities);
+router.get("/universities",protect, universityController.getUniversities);
 router.post("/add-university", universityController.postAddUniversity);
-router.get("/edit-university/:id", universityController.getEditUniversity);
+router.get("/edit-university/:id",protect, universityController.getEditUniversity);
 router.post("/edit-university/:id", universityController.postEditUniversity);
 router.post("/delete-university/:id", universityController.deleteUniversity);
 
 // Gallery routes
-router.get("/university/:id/gallery", universityController.getGalleryPage);
+router.get("/university/:id/gallery",protect, universityController.getGalleryPage);
 router.post(
   "/university/:id/gallery",
   upload.array("galleryImages", 10),
@@ -45,7 +47,7 @@ router.post(
 );
 
 // Partner routes
-router.get("/university/:id/partners", universityController.getPartnerPage);
+router.get("/university/:id/partners",protect, universityController.getPartnerPage);
 router.post(
   "/university/:id/partners",
   upload.array("partnerImages", 10),
@@ -57,7 +59,7 @@ router.post(
 );
 
 // Review routes
-router.get("/university/:id/reviews", universityController.getReviewPage);
+router.get("/university/:id/reviews",protect, universityController.getReviewPage);
 router.post(
   "/university/:id/reviews",
   upload.single("image"),
@@ -69,7 +71,7 @@ router.post(
 );
 
 // Course routes
-router.get("/university/:id/courses", universityController.getCoursePage);
+router.get("/university/:id/courses",protect, universityController.getCoursePage);
 router.post(
   "/university/:id/courses",
   upload.single("courseImage"),
@@ -80,7 +82,7 @@ router.post(
   universityController.deleteCourse
 );
 // Edit Course routes
-router.get("/university/:id/courses/edit/:index", universityController.getEditCoursePage);
+router.get("/university/:id/courses/edit/:index",protect, universityController.getEditCoursePage);
 router.post(
   "/university/:id/courses/edit/:index",
   upload.single("courseImage"),

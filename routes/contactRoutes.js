@@ -5,6 +5,8 @@ const multer = require('multer');
 const path = require('path');
 const uploadDir = path.join(__dirname, '../uploads/contact');
 const fs = require('fs');
+const protect = require("../middleware/authMiddleware");
+
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true }); // creates uploads and contact folders if missing
@@ -22,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-router.get('/admin-contact', contactController.getContactSection);
+router.get('/admin-contact',protect, contactController.getContactSection);
 router.get('/contact', contactController.getAdminContactSection);
 router.post('/admin-contact', upload.array('images'), contactController.postContactSection);
 

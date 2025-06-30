@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Enrollment = require("../models/Enrollment");
+const protect = require("../middleware/authMiddleware");
 
-router.get("/admin/enrollment-list", async (req, res) => {
+
+router.get("/admin/enrollment-list",protect, async (req, res) => {
   const enrollments = await Enrollment.find().sort({ createdAt: -1 });
   res.render("admin/enrollment-list", { enrollments });
 });
@@ -51,7 +53,7 @@ router.post("/contact-inquiry", async (req, res) => {
     res.status(500).send("Something went wrong");
   }
 });
-router.get("/admin/get-in-touch-list", async (req, res) => {
+router.get("/admin/get-in-touch-list",protect, async (req, res) => {
   const inquiries = await ContactInquiry.find().sort({ createdAt: -1 });
   res.render("admin/get-in-touch", { inquiries });
 });

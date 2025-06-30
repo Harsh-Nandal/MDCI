@@ -1,11 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const protect = require("../middleware/authMiddleware");
 
-const upload = multer({ dest: "uploads/courses/" }); // customize as needed
+
+const uploadDir = path.join(__dirname, "../uploads/courses");
+
+// Create the folder if it doesn't exist
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Set up multer with the ensured folder
+const upload = multer({ dest: uploadDir });
+
 const courseController = require("../controllers/courseController");
 
-router.get("/admin-course", courseController.renderCourseForm);
+router.get("/admin-course",protect, courseController.renderCourseForm);
+
 router.post(
   "/add-course",
   upload.fields([
@@ -14,7 +28,9 @@ router.post(
   ]),
   courseController.addCourse
 );
-router.get("/edit-course/:id", courseController.editCourseForm);
+
+router.get("/edit-course/:id",protect, courseController.editCourseForm);
+
 router.post(
   "/edit-course/:id",
   upload.fields([
@@ -25,6 +41,5 @@ router.post(
 );
 
 router.post("/delete-course/:id", courseController.deleteCourse);
-
 
 module.exports = router;

@@ -1,0 +1,180 @@
+<%- include('../partials/sidebar') %>
+<div class="dashboard-main-wrapper">
+  <div class="top-navbar flex-between gap-16" style="background-color: white">
+    <div class="flex-align gap-16">
+      <!-- Toggle Button Start -->
+      <button
+        type="button"
+        class="toggle-btn d-xl-none d-flex text-26 text-gray-500"
+      >
+        <i class="ph ph-list"></i>
+      </button>
+      <!-- Toggle Button End -->
+
+      <h1>Contact Us</h1>
+    </div>
+
+    <div class="flex-align gap-16">
+      <a
+        href="/admin/logout"
+        class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
+      >
+        <span class="text-2xl text-danger-600 d-flex"
+          ><i class="ph ph-sign-out"></i
+        ></span>
+        <span class="text">Log Out</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="container mt-5">
+    <h3>Fees for <%= student.name %></h3>
+    <form action="/admin/student/<%= student._id %>/fees" method="POST">
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Total Fees</label>
+          <input
+            type="number"
+            name="totalFees"
+            id="totalFees"
+            class="form-control"
+            required
+            value="<%= student.fees?.totalFees || '' %>"
+            oninput="calculateFees()"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Discount (%)</label>
+          <input
+            type="number"
+            name="discountPercent"
+            id="discountPercent"
+            class="form-control"
+            value="<%= student.fees?.discountPercent || '' %>"
+            oninput="calculateFees()"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Discount Amount</label>
+          <input
+            type="number"
+            name="discountAmount"
+            id="discountAmount"
+            class="form-control"
+            readonly
+            value="<%= student.fees?.discountAmount || '' %>"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label>Final Amount</label>
+          <input
+            type="number"
+            name="finalAmount"
+            id="finalAmount"
+            class="form-control"
+            readonly
+            value="<%= student.fees?.finalAmount || '' %>"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Amount Paid</label>
+          <input
+            type="number"
+            name="amountPaid"
+            id="amountPaid"
+            class="form-control"
+            value="<%= student.fees?.amountPaid || '' %>"
+            oninput="updateDues()"
+          />
+        </div>
+        <div class="form-group col-md-4">
+          <label>Dues</label>
+          <input
+            type="number"
+            name="dues"
+            id="dues"
+            class="form-control"
+            readonly
+            value="<%= student.fees?.dues || '' %>"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Last Paid Date</label>
+        <input
+          type="date"
+          name="lastPaidDate"
+          class="form-control"
+          value="<%= student.fees?.lastPaidDate ? student.fees.lastPaidDate.toISOString().split('T')[0] : '' %>"
+        />
+      </div>
+
+      <div class="form-group col-md-4">
+        <label>Receipt No</label>
+        <input
+          type="text"
+          name="receiptNo"
+          id="receiptNo"
+          class="form-control"
+          value="<%= student.fees?.receiptNo || '' %>"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Fees</button>
+      <a href="/admin/student/enroll" class="btn btn-secondary">Back</a>
+    </form>
+
+    <% let allInstallments = []; const installments = student.fees?.installments
+    || []; const amountPaid = student.fees?.amountPaid || 0; const lastDate =
+    student.fees?.lastPaidDate; const lastReceipt = student.fees?.receiptNo; //
+    Push saved installments if (installments.length) { installments.forEach(inst
+    => allInstallments.push(inst)); } // If only one installment should match
+    amountPaid if (installments.length === 1) { allInstallments = [{ amount:
+    amountPaid, date: lastDate, receiptNo: lastReceipt }]; } // If more than one
+    installment, calculate new payment delta else if (installments.length > 1 &&
+    lastDate && lastReceipt) { const savedTotal = installments.reduce((sum,
+    inst) => sum + inst.amount, 0); const latestAmount = amountPaid -
+    savedTotal; if (latestAmount > 0) { allInstallments.push({ amount:
+    latestAmount, date: lastDate, receiptNo: lastReceipt }); } } %> <% if
+    (allInstallments.length) { %>
+    <h4 class="mt-5">Installment History</h4>
+    <table
+      id="installmentTable"
+      class="table table-bordered display nowrap w-100"
+    >
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Receipt No</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% allInstallments.forEach((inst, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td>₹<%= inst.amount %></td>
+          <td><%= new Date(inst.date).toLocaleDateString() %></td>
+          <td><%= inst.receiptNo %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <script>
+      $(function () {
+        $("#installmentTable").DataTable({
+          dom: "Bfrtip",
+          buttons: ["copy", "excel", "pdf", "print"],
+          scrollX: true,
+        });
+      });
+    </script>
+    <% } %>
+  </div>
+</div>

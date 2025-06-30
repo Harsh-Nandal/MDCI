@@ -1,18 +1,20 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const siteConfigSchema = new mongoose.Schema({
   headerImageId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Image'
+    ref: "Image",
   },
   footerImageId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Image'
+    ref: "Image",
   },
   bannerImageId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Image'
-  }
+    ref: "Image",
+  },
+  siteName: String,
+  logo: String,
 });
 
-module.exports = mongoose.model('SiteConfig', siteConfigSchema);
+module.exports = mongoose.model("SiteConfig", siteConfigSchema);

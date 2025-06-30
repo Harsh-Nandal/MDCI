@@ -5,6 +5,8 @@ const Course = require("../models/Course");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const protect = require("../middleware/authMiddleware");
+
 
 // Upload folder setup
 const uploadPath = path.join(__dirname, "../uploads/students");
@@ -21,7 +23,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // 🚀 Show all students + form
-router.get("/admin/student/enroll", async (req, res) => {
+router.get("/admin/student/enroll",protect, async (req, res) => {
   const students = await Student.find()
     .populate("course")
     .sort({ createdAt: -1 });
@@ -57,7 +59,7 @@ router.post("/admin/student/delete/:id", async (req, res) => {
 });
 
 // ✏️ Show edit student form
-router.get("/admin/student/edit/:id", async (req, res) => {
+router.get("/admin/student/edit/:id",protect, async (req, res) => {
   const student = await Student.findById(req.params.id);
   const courses = await Course.find();
   if (!student) return res.status(404).send("Student not found");
@@ -92,7 +94,7 @@ router.post(
 );
 
 // ✨ Show fees form
-router.get("/admin/student/:id/fees", async (req, res) => {
+router.get("/admin/student/:id/fees",protect, async (req, res) => {
   const student = await Student.findById(req.params.id);
   if (!student) return res.status(404).send("Student not found");
   res.render("admin/student-fees", { student });
@@ -158,7 +160,7 @@ router.post("/admin/student/:id/fees", async (req, res) => {
 });
 
 // 💰 Fees structure table
-router.get("/admin/student/fees-structure", async (req, res) => {
+router.get("/admin/student/fees-structure",protect, async (req, res) => {
   const students = await Student.find().populate("course").sort({ name: 1 });
   res.render("admin/fees-Structure", { students });
 });

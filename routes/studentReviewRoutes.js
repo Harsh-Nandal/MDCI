@@ -4,6 +4,8 @@ const controller = require('../controllers/studentReviewController');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const protect = require("../middleware/authMiddleware");
+
 
 
 const uploadDir = path.join(__dirname, '../public/uploads/reviews');
@@ -26,7 +28,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Routes
-router.get('/student-reviews', controller.getStudentReviews);
+router.get('/student-reviews',protect, controller.getStudentReviews);
 router.post('/add-student-review', upload.single('image'), controller.addStudentReview);
 router.post('/delete-student-review/:id', controller.deleteStudentReview);
 

@@ -4,6 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const mdciGalleryController = require("../controllers/mdciGalleryController");
+const protect = require("../middleware/authMiddleware");
+
 
 // Multer config
 const storage = multer.diskStorage({
@@ -25,7 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Routes
-router.get("/admin-gallery", mdciGalleryController.getMdciGallery);
+router.get("/admin-gallery",protect, mdciGalleryController.getMdciGallery);
 router.post("/admin-gallery", upload.array("image", 10), mdciGalleryController.uploadMdciGalleryImages);
 router.post("/delete-admin-image/:id", mdciGalleryController.deleteMdciGalleryImage);
 
