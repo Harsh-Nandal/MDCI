@@ -18,6 +18,7 @@ exports.getAdminTermsConditionsSection = async (req, res) => {
     ]);
 
     res.render("admin/admin-terms&conditions", {
+      currentPath: req.path,
       termsConditionsMetaHeading: termsConditionsMetaHeading?.html || "",
       termsConditionsMetaDescription:
         termsConditionsMetaDescription?.html || "",
@@ -48,6 +49,7 @@ exports.getTermsConditionsSection = async (req, res) => {
     ]);
 
     res.render("terms&conditions", {
+      currentPath: req.path,
       termsConditionsMetaHeading: termsConditionsMetaHeading?.html || "",
       termsConditionsMetaDescription:
         termsConditionsMetaDescription?.html || "",

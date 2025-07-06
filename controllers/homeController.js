@@ -7,7 +7,9 @@ const placementStudentsController = require("./placementStudentsController"); //
 const otherImages = require("../models/otherImages");
 const Faq = require("../models/FAQ"); // import your FAQ model
 const reviewModel = require("../models/StudentReview");
-const AboutMedia = require("../models/AboutMedia.js")
+const AboutMedia = require("../models/AboutMedia.js");
+const University = require("../models/University.js");
+const Course = require("../models/Course.js");
 
 exports.renderHomePage = async (req, res) => {
   try {
@@ -103,6 +105,18 @@ exports.renderHomePage = async (req, res) => {
       placementStudentsController.getplacementStudentsImages(),
       reviewModel.find(),
     ]);
+    const universities = await University.find();
+    const courses = await Course.find().sort({ createdAt: -1 });
+    const allCourses = await Course.find().sort({ createdAt: -1 });
+
+    const groupedCourses = {};
+    allCourses.forEach((course) => {
+      const category = course.category || "Uncategorized";
+      if (!groupedCourses[category]) {
+        groupedCourses[category] = [];
+      }
+      groupedCourses[category].push(course);
+    });
 
     res.render("home", {
       currentContent: homepageContent?.html || "",
@@ -133,6 +147,9 @@ exports.renderHomePage = async (req, res) => {
       placementStudentImages,
       reviews,
       faqs,
+      universities,
+      courses,
+      groupedCourses, // 👈 added this
     });
   } catch (err) {
     console.error(err);
@@ -236,6 +253,8 @@ exports.renderAdminPage = async (req, res) => {
     ]);
 
     res.render("admin/admin-home", {
+      currentPath: req.path,
+      currentPath: req.path,
       currentContent: homepageContent?.html || "",
       contentAboveForm: contentAboveForm?.html || "",
       placementContent: placementContent?.html || "",
@@ -270,4 +289,3 @@ exports.renderAdminPage = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
-

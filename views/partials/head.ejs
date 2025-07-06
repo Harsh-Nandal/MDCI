@@ -60,4 +60,31 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <!-- Summernote CSS -->
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/phosphor.css" />
 
+
+<style>
+    .sidebar-menu__item.active > .sidebar-menu__link,
+.sidebar-submenu__item.active > .sidebar-submenu__link {
+  background-color: #1976d2; /* Soft blue or match your theme */
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.sidebar-menu__item.active i,
+.sidebar-submenu__item.active i {
+  color: #fff;
+}
+
+.sidebar-submenu__item.active > .sidebar-submenu__link {
+  padding-left: 24px;
+}
+
+.sidebar-menu__link,
+.sidebar-submenu__link {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+</style>

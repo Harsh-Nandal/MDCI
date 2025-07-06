@@ -3,7 +3,7 @@ const StudentReview = require('../models/StudentReview');
 exports.getStudentReviews = async (req, res) => {
   try {
     const reviews = await StudentReview.find();
-    res.render('admin', { reviews });
+    res.render('admin', { reviews,currentPath: req.path, });
   } catch (err) {
     console.error('Get Review Error:', err);
     res.status(500).send('Server Error');

@@ -6,14 +6,13 @@ const path = require("path");
 exports.renderCourseForm = async (req, res) => {
   try {
     const courses = await Course.find().sort({ createdAt: -1 });
-    res.render("admin/admin-course", { courses });
+    res.render("admin/admin-course", { courses, currentPath: req.path, });
   } catch (error) {
     console.error("Error loading course form:", error);
     res.status(500).send("Internal Server Error");
   }
 };
 
-// Add a new course
 exports.addCourse = async (req, res) => {
   try {
     const {
@@ -24,39 +23,37 @@ exports.addCourse = async (req, res) => {
       metaTitle,
       metaDescription,
       metaKeywords,
+      category, 
     } = req.body;
 
-    const topics = [];
-    if (req.body.topics && Array.isArray(req.body.topics)) {
-      req.body.topics.forEach(t => {
-        topics.push({
-          name: t.name,
-          duration: t.duration
-        });
-      });
-    } else if (req.body.topics && typeof req.body.topics === 'object') {
-      for (let key in req.body.topics) {
-        topics.push({
-          name: req.body.topics[key].name,
-          duration: req.body.topics[key].duration
-        });
-      }
-    }
+    // Parse topics from simpler arrays
+    const names = req.body.topicNames || [];
+    const durations = req.body.topicDurations || [];
 
-    const courseImage = req.files?.courseImage?.[0]?.path?.replace(/\\/g, "/");
-    const pdf = req.files?.pdf?.[0]?.path?.replace(/\\/g, "/");
+    const parsedTopics = names.map((name, index) => ({
+      name,
+      duration: durations[index] || "",
+    }));
+
+    // File paths
+    const courseImageFile = req.files?.courseImage?.[0]?.filename;
+    const pdfFile = req.files?.pdf?.[0]?.filename;
 
     const newCourse = new Course({
       name,
       rating,
       fees,
-      courseImage: courseImage ? "/" + courseImage : undefined,
-      pdf: pdf ? "/" + pdf : undefined,
       topicCoverContent,
-      topics,
+      topics: parsedTopics,
+      courseImage: courseImageFile
+        ? `/uploads/courses/${courseImageFile}`
+        : undefined,
+      pdf: pdfFile ? `/uploads/courses/${pdfFile}` : undefined,
       metaTitle,
       metaDescription,
       metaKeywords,
+        category, // ✅ ADDED
+
     });
 
     await newCourse.save();
@@ -71,15 +68,14 @@ exports.addCourse = async (req, res) => {
 exports.editCourseForm = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).send("Course not found");
-    res.render("admin/edit-course", { course });
+    if (!course) return res.redirect("/admin-course?error=notfound");
+    res.render("admin/edit-course", { course, currentPath: req.path, });
   } catch (error) {
     console.error("Error loading course:", error);
     res.status(500).send("Internal Server Error");
   }
 };
 
-// Update the course
 exports.updateCourse = async (req, res) => {
   try {
     const {
@@ -90,28 +86,42 @@ exports.updateCourse = async (req, res) => {
       metaTitle,
       metaDescription,
       metaKeywords,
+        category, // ✅ ADDED
+
     } = req.body;
 
-    const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).send("Course not found");
+    const names = req.body.topicNames || [];
+    const durations = req.body.topicDurations || [];
 
-    const topics = [];
-    if (req.body.topics && typeof req.body.topics === 'object') {
-      for (let key in req.body.topics) {
-        topics.push({
-          name: req.body.topics[key].name,
-          duration: req.body.topics[key].duration
-        });
+    const parsedTopics = names.map((name, index) => ({
+      name,
+      duration: durations[index] || "",
+    }));
+
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.redirect("/admin-course?error=notfound");
+
+    // Replace files if new ones are uploaded
+    const courseImageFile = req.files?.courseImage?.[0]?.filename;
+    const pdfFile = req.files?.pdf?.[0]?.filename;
+
+    if (courseImageFile) {
+      if (course.courseImage) {
+        const oldImagePath = path.join(__dirname, "..", course.courseImage);
+        fs.existsSync(oldImagePath) && fs.unlinkSync(oldImagePath);
       }
+      course.courseImage = `/uploads/courses/${courseImageFile}`;
     }
 
-    // Optional file replacements
-    const courseImage = req.files?.courseImage?.[0]?.path?.replace(/\\/g, "/");
-    const pdf = req.files?.pdf?.[0]?.path?.replace(/\\/g, "/");
+    if (pdfFile) {
+      if (course.pdf) {
+        const oldPdfPath = path.join(__dirname, "..", course.pdf);
+        fs.existsSync(oldPdfPath) && fs.unlinkSync(oldPdfPath);
+      }
+      course.pdf = `/uploads/courses/${pdfFile}`;
+    }
 
-    if (courseImage) course.courseImage = "/" + courseImage;
-    if (pdf) course.pdf = "/" + pdf;
-
+    // Update fields
     course.name = name;
     course.rating = rating;
     course.fees = fees;
@@ -119,7 +129,9 @@ exports.updateCourse = async (req, res) => {
     course.metaTitle = metaTitle;
     course.metaDescription = metaDescription;
     course.metaKeywords = metaKeywords;
-    course.topics = topics;
+    course.topics = parsedTopics; 
+    course.category =   category; // ✅ ADDED
+// Replace all topics with the new array
 
     await course.save();
     res.redirect("/admin-course");
@@ -132,10 +144,66 @@ exports.updateCourse = async (req, res) => {
 // Delete course
 exports.deleteCourse = async (req, res) => {
   try {
-    await Course.findByIdAndDelete(req.params.id);
+    const course = await Course.findById(req.params.id);
+    if (course) {
+      // Delete course image and PDF
+      if (course.courseImage) {
+        const imagePath = path.join(__dirname, "..", course.courseImage);
+        fs.existsSync(imagePath) && fs.unlinkSync(imagePath);
+      }
+      if (course.pdf) {
+        const pdfPath = path.join(__dirname, "..", course.pdf);
+        fs.existsSync(pdfPath) && fs.unlinkSync(pdfPath);
+      }
+
+      await Course.findByIdAndDelete(req.params.id);
+    }
+
     res.redirect("/admin-course");
   } catch (error) {
     console.error("Error deleting course:", error);
     res.status(500).send("Internal Server Error");
   }
 };
+exports.deleteTopic = async (req, res) => {
+  try {
+    const { courseId, topicIndex } = req.params;
+
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).send("Course not found");
+    }
+
+    // Remove topic at given index
+    course.topics.splice(topicIndex, 1);
+
+    await course.save();
+    res.redirect(`/edit-course/${courseId}`);
+  } catch (error) {
+    console.error("Error deleting topic:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+exports.getCourses = async (req, res) => {
+  try {
+    const allCourses = await Course.find();
+
+    const groupedCourses = {};
+
+    allCourses.forEach(course => {
+      const category = course.category || "Others";
+      if (!groupedCourses[category]) {
+        groupedCourses[category] = [];
+      }
+      groupedCourses[category].push(course);
+    });
+
+    res.render("ourCourses", { groupedCourses, currentPath: req.path, }); // your EJS view
+  } catch (err) {
+    console.error("Error loading courses:", err);
+    res.status(500).send("Server Error");
+  }
+};
+

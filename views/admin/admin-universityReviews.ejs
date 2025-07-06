@@ -81,46 +81,62 @@
         <!-- Display Existing Reviews -->
         <h4>Existing Reviews</h4>
         <% if (university.reviews && university.reviews.length > 0) { %>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Summary</th>
-              <th>Name</th>
-              <th>Rating</th>
-              <th>Image</th>
-              <th>Review</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% university.reviews.forEach((item, index) => { %>
-            <tr>
-              <td><%= item.reviewText %></td>
-              <td><%= item.review.name %></td>
-              <td><%= item.review.rating %></td>
-              <td>
-                <% if (item.review.image) { %>
-                <img src="<%= item.review.image %>" height="40" />
-                <% } else { %> No Image <% } %>
-              </td>
-              <td><%= item.review.review %></td>
-              <td>
-                <form
-                  action="/admin/university/<%= university._id %>/reviews/delete/<%= index %>"
-                  method="POST"
+        <div class="table-responsive">
+          <table
+            class="table table-bordered table-hover align-middle text-center"
+          >
+            <thead class="table-dark">
+              <tr>
+                <th style="min-width: 100px">Name</th>
+                <th style="min-width: 80px">Rating</th>
+                <th style="min-width: 100px">Image</th>
+                <th style="min-width: 200px">Review</th>
+                <th style="min-width: 100px">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% university.reviews.forEach((item, index) => { %>
+              <tr>
+                <td><%= item.review.name %></td>
+                <td><%= item.review.rating %></td>
+                <td>
+                  <% if (item.review.image) { %>
+                  <img
+                    src="<%= item.review.image %>"
+                    style="max-width: 80px; max-height: 80px; object-fit: cover"
+                    alt="Review Image"
+                  />
+                  <% } else { %> No Image <% } %>
+                </td>
+                <td
+                  style="
+                    word-break: break-word;
+                    white-space: normal;
+                    max-width: 300px;
+                  "
                 >
-                  <button
-                    class="btn btn-sm btn-danger"
-                    onclick="return confirm('Are you sure to delete this review?')"
+                  <%= item.review.review %>
+                </td>
+
+                <td>
+                  <form
+                    action="/admin/university/<%= university._id %>/reviews/delete/<%= index %>"
+                    method="POST"
                   >
-                    Delete
-                  </button>
-                </form>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      onclick="return confirm('Are you sure to delete this review?')"
+                    >
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
         <% } else { %>
         <p>No reviews added yet.</p>
         <% } %>

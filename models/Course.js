@@ -9,17 +9,20 @@ const courseSchema = new mongoose.Schema({
   name: { type: String, required: true },
   rating: { type: Number, default: 0 },
   fees: { type: Number, required: true },
-  courseImage: { type: String }, // e.g., /uploads/courses/image.jpg
-  pdf: { type: String },         // e.g., /uploads/courses/brochure.pdf
+  courseImage: { type: String },
+  pdf: { type: String },
+  topicCoverContent: { type: String },
 
-  topicCoverContent: { type: String }, // detailed content (HTML or plain text)
+  topics: [topicSchema],
 
-  topics: [topicSchema], // Array of topics with name + duration
+  // ✅ Reference to Subject documents
+  subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
 
-  // SEO fields
+  category: { type: String, required: true },
+
   metaTitle: { type: String },
   metaDescription: { type: String },
-  metaKeywords: { type: String }
+  metaKeywords: { type: String },
 }, {
   timestamps: true
 });

@@ -3,7 +3,7 @@ const FAQ = require('../models/FAQ');
 // Render FAQ management page
 exports.renderFAQPage = async (req, res) => {
   const faqs = await FAQ.find();
-  res.render('admin', { faqs });
+  res.render('admin', { faqs, currentPath: req.path, });
 };
 
 // Add new FAQ

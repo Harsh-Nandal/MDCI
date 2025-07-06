@@ -8,7 +8,7 @@ const protect = require("../middleware/authMiddleware");
 // View all inquiries
 router.get("/admin/counsel-list",protect, async (req, res) => {
   const inquiries = await BannerInquiry.find().sort({ createdAt: -1 });
-  res.render("admin/counsel-list", { inquiries });
+  res.render("admin/counsel-list", { inquiries, currentPath: req.path, });
 });
 
 router.post("/banner-inquiry", async (req, res) => {

@@ -21,6 +21,7 @@ exports.getAdminprivacyPolicySection = async (req, res) => {
     ]);
 
     res.render("admin/admin-privacyPolicy", {
+      currentPath: req.path,
       siteConfig,
       privacyPolicyMetaHeading: privacyPolicyMetaHeading?.html || "",
       privacyPolicyMetaDescription: privacyPolicyMetaDescription?.html || "",
@@ -49,6 +50,7 @@ exports.getprivacyPolicySection = async (req, res) => {
     ]);
 
     res.render("privacyPolicy", {
+      currentPath: req.path,
       siteConfig,
       privacyPolicyMetaHeading: privacyPolicyMetaHeading?.html || "",
       privacyPolicyMetaDescription: privacyPolicyMetaDescription?.html || "",

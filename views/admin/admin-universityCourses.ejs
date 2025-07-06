@@ -83,7 +83,7 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th>Text</th>
+              
               <th>Name</th>
               <th>Duration</th>
               <th>Image</th>
@@ -94,10 +94,10 @@
           <tbody>
             <% university.courses.forEach((course, index) => { %>
             <tr>
-              <td><%= course.offeredCourseText %></td>
+              
               <td><%= course.course.name %></td>
               <td><%= course.course.duration %></td>
-              <td><img src="<%= course.course.image %>" height="40" /></td>
+              <td><img src="<%= course.course.image %>" width="100" /></td>
               <td>
                 <% if (course.viewLink) { %>
                 <a

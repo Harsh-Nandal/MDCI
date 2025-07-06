@@ -1,9 +1,14 @@
+// ===========================
+// contactController.js (Final Fixed)
+// ===========================
+
 const ContactSection = require("../models/ContactSection");
 const fs = require("fs");
+const path = require("path");
 const Content = require("../models/Content");
 const SiteConfig = require("../models/SiteConfig");
 
-exports.getAdminContactSection = async (req, res) => {
+exports.getContactSection = async (req, res) => {
   try {
     const [
       siteConfig,
@@ -11,7 +16,7 @@ exports.getAdminContactSection = async (req, res) => {
       contactMetaDescription,
       contactMetaKeyword,
       topContactSection,
-      homepage
+      homepage,
     ] = await Promise.all([
       SiteConfig.findOne(),
       Content.findOne({ section: "contactMetaHeading" }),
@@ -29,15 +34,17 @@ exports.getAdminContactSection = async (req, res) => {
       contactMetaDescription: contactMetaDescription?.html || "",
       contactMetaKeyword: contactMetaKeyword?.html || "",
       topContactSection: topContactSection?.html || "",
-      siteConfig, // Optional: in case you want to use it in the view
-      contactSections
+      siteConfig,
+      contactSections,
+      currentPath: req.path,
     });
   } catch (err) {
     console.error("Error fetching contact section:", err);
     res.status(500).send("Server error");
   }
 };
-exports.getContactSection = async (req, res) => {
+
+exports.getAdminContactSection = async (req, res) => {
   try {
     const [
       siteConfig,
@@ -56,13 +63,13 @@ exports.getContactSection = async (req, res) => {
     const contactSections = await ContactSection.find();
 
     res.render("admin/admin-contact", {
-     
       contactMetaHeading: contactMetaHeading?.html || "",
       contactMetaDescription: contactMetaDescription?.html || "",
       contactMetaKeyword: contactMetaKeyword?.html || "",
       topContactSection: topContactSection?.html || "",
-      siteConfig, // Optional: in case you want to use it in the view
-      contactSections
+      siteConfig,
+      contactSections,
+      currentPath: req.path,
     });
   } catch (err) {
     console.error("Error fetching contact section:", err);
@@ -71,30 +78,44 @@ exports.getContactSection = async (req, res) => {
 };
 
 exports.postContactSection = async (req, res) => {
-  
-   const { id = [], name = [], heading = [], content = [] } = req.body;
-  const files = req.files || [];
+  const { id = [], name = [], heading = [], content = [] } = req.body;
+  const uploadedImages = Array.isArray(req.files.images)
+    ? req.files.images
+    : [];
 
   try {
-    for (let i = 0; i < id.length; i++) {
-      const imagePath = files[i] ? `/uploads/contact/${files[i].filename}` : undefined;
+    for (let i = 0; i < 3; i++) {
+      if (!name[i] || !heading[i] || !content[i]) continue; // Skip invalid rows
+
+      const imagePath = uploadedImages[i]
+        ? `/uploads/contact/${uploadedImages[i].filename}`
+        : undefined;
+
+      const updateData = {
+        name: name[i],
+        heading: heading[i],
+        content: content[i],
+      };
+
+      if (imagePath) {
+        updateData.imagePath = imagePath;
+      }
 
       if (id[i]) {
-        const updateData = {
-          heading: heading[i],
-          content: content[i],
-        };
-        if (imagePath) {
-          updateData.imagePath = imagePath;
+        const oldDoc = await ContactSection.findById(id[i]);
+        if (oldDoc?.imagePath && imagePath && oldDoc.imagePath !== imagePath) {
+          const fullPath = path.join(__dirname, '..', oldDoc.imagePath);
+          if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
         }
-
         await ContactSection.findByIdAndUpdate(id[i], updateData);
+      } else {
+        await new ContactSection(updateData).save();
       }
     }
 
-    res.redirect('/admin-contact');
+    res.redirect("/admin-contact");
   } catch (err) {
-    console.error('Error updating contact sections:', err);
-    res.status(500).send('Internal Server Error');
+    console.error("Error updating contact sections:", err);
+    res.status(500).send("Internal Server Error");
   }
 };

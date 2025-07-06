@@ -8,6 +8,7 @@ const session = require("express-session");
 
 const connectDB = require("./connectDB");
 const protect = require("./middleware/authMiddleware");
+const University = require("./models/University");
 
 // Load environment variables
 dotenv.config();
@@ -58,6 +59,8 @@ const brochureController = require("./controllers/brochureController");
 const placementImagesController = require("./controllers/PlacementImagesController");
 const termsConditionsController = require("./controllers/terms&conditionsController");
 const privacyPolicyController = require("./controllers/privacyPolicyController");
+const ourCoursesController = require("./controllers/ourCoursesController");
+const dashboardController = require("./controllers/dashboardController");
 
 // Route files
 const EnrollmentRoutes = require("./routes/enrollmentRoutes");
@@ -76,40 +79,90 @@ const eventRoutes = require("./routes/eventRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const universityRoutes = require("./routes/universityRoutes");
 const bannerInquiryRoutes = require("./routes/bannerInquiryRoutes");
+const adminDashboardRoutes = require("./routes/adminDashboard");
+const studentDashboardRoutes = require("./routes/studentDashboard");
 
 // === Routes ===
+
+const SiteConfig = require("./models/SiteConfig");
+const Image = require("./models/Image");
+
+app.use(async (req, res, next) => {
+  try {
+    const config = await SiteConfig.findOne();
+    let headerImageUrl = "/simpleImage.png";
+
+    if (config?.headerImageId) {
+      const image = await Image.findById(config.headerImageId);
+      if (image) {
+        headerImageUrl = image.url;
+      }
+    }
+
+    res.locals.headerImageUrl = headerImageUrl;
+    next();
+  } catch (err) {
+    console.error("Error setting headerImageUrl:", err);
+    res.locals.headerImageUrl = "/simpleImage.png";
+    next();
+  }
+});
 
 // Static pages
 app.get("/", homeController.renderHomePage);
 app.get("/edit-page", protect, homeController.renderAdminPage);
 app.get("/aboutUs", aboutController.renderPageAboutUs);
 app.get("/admin-aboutUs", protect, aboutController.renderAdminPageAboutUs);
-app.get("/ourCourses", (req, res) => res.render("OurCourses"));
-app.get("/university/colleges", (req, res) => res.render("university"));
+app.get("/ourCourses", ourCoursesController.renderOurCoursesPage);
+app.get("/ourCourses/:id", ourCoursesController.renderCourseDetailsPage);
+app.get("/university/colleges", async (req, res) => {
+  const universities = await University.find();
+  res.render("university", { universities, currentPath: req.path });
+});
+
 app.get("/contact", (req, res) => res.render("contact"));
-app.get("/terms&conditions", termsConditionsController.getTermsConditionsSection);
+app.get(
+  "/terms&conditions",
+  termsConditionsController.getTermsConditionsSection
+);
 app.get("/privacyPolicy", privacyPolicyController.getprivacyPolicySection);
 
 // University detail pages
 app.get("/amityUniversity", (req, res) => res.render("amity_university"));
 app.get("/chitkaraUniversity", (req, res) => res.render("chitkara_university"));
 app.get("/kalingaUniversity", (req, res) => res.render("kalinga_university"));
-app.get("/manavRachnaUniversity", (req, res) => res.render("manav_rachna_university"));
-app.get("/vivekanandUniversity", (req, res) => res.render("vivekanand_university"));
+app.get("/manavRachnaUniversity", (req, res) =>
+  res.render("manav_rachna_university")
+);
+app.get("/vivekanandUniversity", (req, res) =>
+  res.render("vivekanand_university")
+);
 app.get("/LPUUniversity", (req, res) => res.render("LPU_university"));
 
 app.get("/gallery", (req, res) => res.render("gallery"));
 
-// Admin dashboard
-app.get("/admin/dashboard", protect, (req, res) => res.render("admin/dashboard"));
+app.use("/admin", adminDashboardRoutes);
+app.use("/student", studentDashboardRoutes);
 
 // Placement Partner Images
-app.post("/placement-image", upload.array("image", 10), placementImagesController.uploadPlacementImages);
+app.post(
+  "/placement-image",
+  upload.array("image", 10),
+  placementImagesController.uploadPlacementImages
+);
 app.post("/delete-image/:id", placementImagesController.deletePlacementImage);
 
 // Admin Terms & Privacy Policy Section
-app.get("/admin-terms&conditions", protect, termsConditionsController.getAdminTermsConditionsSection);
-app.get("/admin-privacyPolicy", protect, privacyPolicyController.getAdminprivacyPolicySection);
+app.get(
+  "/admin-terms&conditions",
+  protect,
+  termsConditionsController.getAdminTermsConditionsSection
+);
+app.get(
+  "/admin-privacyPolicy",
+  protect,
+  privacyPolicyController.getAdminprivacyPolicySection
+);
 
 // Update content
 app.post("/update-content", contentController.updateContent);
@@ -132,6 +185,9 @@ app.use(aboutRoutes);
 app.use(contactRoutes);
 app.use(adminRoutes);
 app.use(studentReviewRoutes);
+
+const subjectRoutes = require("./routes/subjectRoutes");
+app.use(subjectRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {

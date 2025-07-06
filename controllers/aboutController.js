@@ -82,7 +82,7 @@ exports.renderAdminPageAboutUs = async (req, res) => {
       studentReviewContent: studentReviewContent?.html || "",
       topAboutSection: topAboutSection?.html || "",
       bottomAboutSection: bottomAboutSection?.html || "",
-
+      currentPath: req.path,
       headerImageUrl: headerImage?.url || "/simpleImage.png",
       footerImageUrl: footerImage?.url || "/simpleImage.png",
       PlacementImages,
@@ -179,7 +179,7 @@ exports.renderPageAboutUs = async (req, res) => {
       studentReviewContent: studentReviewContent?.html || "",
       topAboutSection: topAboutSection?.html || "",
       bottomAboutSection: bottomAboutSection?.html || "",
-
+      currentPath: req.path,
       headerImageUrl: headerImage?.url || "/simpleImage.png",
       footerImageUrl: footerImage?.url || "/simpleImage.png",
       PlacementImages,

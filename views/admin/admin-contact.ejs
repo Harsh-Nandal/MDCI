@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-     <%- include('../partials/head') %>
+    <%- include('../partials/head') %>
     <style>
       body {
         background: #f8f9fa;
         padding-left: 1rem;
         padding-right: 1rem;
-        
       }
       h1,
       h2,
@@ -107,157 +106,159 @@
         </div>
       </div>
 
-       <!-- Body Content Starts here  -->
-        <!-- Section: Top Content Contact -->
-    <div class="form-section">
-      <form action="/update-content" method="POST">
-        <input type="hidden" name="section" value="topContactSection" />
-        <input type="hidden" name="redirectTo" value="/admin-contact" />
-        <label for="editor-topContactSection">Top Contact Content</label>
-        <textarea
-          id="editor-topContactSection"
-          name="content"
-          class="form-control"
-        >
+      <!-- Body Content Starts here  -->
+      <!-- Section: Top Content Contact -->
+      <div class="form-section">
+        <form action="/update-content" method="POST">
+          <input type="hidden" name="section" value="topContactSection" />
+          <input type="hidden" name="redirectTo" value="/admin-contact" />
+          <label for="editor-topContactSection">Top Contact Content</label>
+          <textarea
+            id="editor-topContactSection"
+            name="content"
+            class="form-control"
+          >
 <%- topContactSection %></textarea
-        >
-        <button type="submit" class="btn btn-success mt-2">
-          Update Above Form Content
-        </button>
-      </form>
-    </div>
+          >
+          <button type="submit" class="btn btn-success mt-2">
+            Update Above Form Content
+          </button>
+        </form>
+      </div>
 
-    <form method="POST" enctype="multipart/form-data" action="/admin-contact">
-      <div class="container mt-4">
-        <% for (let i = 0; i < 3; i++) { const section = contactSections[i] || {
-        _id: '', name: '', heading: '', content: '', imagePath: '' }; %>
-        <input type="hidden" name="id[]" value="<%= section._id %>" />
-        <input type="hidden" name="name[]" value="<%= section.name %>" />
+      <form method="POST" enctype="multipart/form-data" action="/admin-contact">
+  <div class="container mt-4">
+    <% for (let i = 0; i < 3; i++) { 
+      const section = contactSections[i] || { _id: '', name: '', heading: '', content: '', imagePath: '' }; 
+    %>
+      <input type="hidden" name="id[]" value="<%= section._id %>" />
+      <input type="hidden" name="name[]" value="<%= section.name %>" />
 
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label>Heading <%= i + 1 %></label>
-            <input
-              type="text"
-              class="form-control"
-              name="heading[]"
-              value="<%= section.heading %>"
-            />
-          </div>
-          <div class="col-md-4">
-            <label>Content <%= i + 1 %></label>
-            <input
-              type="text"
-              class="form-control"
-              name="content[]"
-              value="<%= section.content %>"
-            />
-          </div>
-          <div class="col-md-4">
-            <label>Image <%= i + 1 %></label>
-            <input type="file" class="form-control" name="images" />
-            <% if (section.imagePath) { %>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label>Heading <%= i + 1 %></label>
+          <input
+            type="text"
+            class="form-control"
+            name="heading[]"
+            value="<%= section.heading %>"
+          />
+        </div>
+        <div class="col-md-4">
+          <label>Content <%= i + 1 %></label>
+          <input
+            type="text"
+            class="form-control"
+            name="content[]"
+            value="<%= section.content %>"
+          />
+        </div>
+        <div class="col-md-4">
+          <label>Image <%= i + 1 %></label>
+          <!-- FIXED: Removed [] from name -->
+          <input type="file" class="form-control" name="images" />
+          <% if (section.imagePath) { %>
             <img
               src="<%= section.imagePath %>"
               width="60"
               style="margin-top: 5px"
             />
-            <% } %>
-          </div>
+          <% } %>
         </div>
-        <% } %>
-
-        <button type="submit" class="btn btn-primary mt-3">
-          Save Contact Section
-        </button>
       </div>
-    </form>
-    <br /><br />
+    <% } %>
 
-    <!-- Section: Meta Title -->
-    <div class="form-section">
-      <form action="/update-content" method="POST">
-        <input type="hidden" name="section" value="contactMetaHeading" />
-        <input type="hidden" name="redirectTo" value="/admin-contact" />
-        <div class="form-floating-label">
-          <textarea
-            id="editor-contactMetaHeading"
-            name="content"
-            class="form-control"
-            placeholder=" "
-          >
+    <button type="submit" class="btn btn-primary mt-3">
+      Save Contact Section
+    </button>
+  </div>
+</form>
+
+
+      <br /><br />
+
+      <!-- Section: Meta Title -->
+      <div class="form-section">
+        <form action="/update-content" method="POST">
+          <input type="hidden" name="section" value="contactMetaHeading" />
+          <input type="hidden" name="redirectTo" value="/admin-contact" />
+          <div class="form-floating-label">
+            <textarea
+              id="editor-contactMetaHeading"
+              name="content"
+              class="form-control"
+              placeholder=" "
+            >
 <%= contactMetaHeading %></textarea
-          >
-          <label for="editor-contactMetaHeading">Meta Title</label>
-        </div>
-        <button type="submit" class="btn btn-success mt-2">
-          Update Above Form Content
-        </button>
-      </form>
-    </div>
+            >
+            <label for="editor-contactMetaHeading">Meta Title</label>
+          </div>
+          <button type="submit" class="btn btn-success mt-2">
+            Update Above Form Content
+          </button>
+        </form>
+      </div>
 
-    <!-- Section: Meta Description -->
-    <div class="form-section">
-      <form action="/update-content" method="POST">
-        <input type="hidden" name="section" value="contactMetaDescription" />
-        <input type="hidden" name="redirectTo" value="/admin-contact" />
-        <div class="form-floating-label">
-          <textarea
-            id="editor-contactMetaDescription"
-            name="content"
-            class="form-control"
-            placeholder=" "
-          >
+      <!-- Section: Meta Description -->
+      <div class="form-section">
+        <form action="/update-content" method="POST">
+          <input type="hidden" name="section" value="contactMetaDescription" />
+          <input type="hidden" name="redirectTo" value="/admin-contact" />
+          <div class="form-floating-label">
+            <textarea
+              id="editor-contactMetaDescription"
+              name="content"
+              class="form-control"
+              placeholder=" "
+            >
 <%= contactMetaDescription %></textarea
-          >
-          <label for="editor-contactMetaDescription">Meta Description</label>
-        </div>
-        <button type="submit" class="btn btn-success mt-2">
-          Update Above Form Content
-        </button>
-      </form>
-    </div>
+            >
+            <label for="editor-contactMetaDescription">Meta Description</label>
+          </div>
+          <button type="submit" class="btn btn-success mt-2">
+            Update Above Form Content
+          </button>
+        </form>
+      </div>
 
-    <!-- Section: Meta Keywords -->
-    <div class="form-section">
-      <form action="/update-content" method="POST">
-        <input type="hidden" name="section" value="contactMetaKeyword" />
-        <input type="hidden" name="redirectTo" value="/admin-contact" />
-        <div class="form-floating-label">
-          <textarea
-            id="editor-contactMetaKeyword"
-            name="content"
-            class="form-control"
-            placeholder=" "
-          >
+      <!-- Section: Meta Keywords -->
+      <div class="form-section">
+        <form action="/update-content" method="POST">
+          <input type="hidden" name="section" value="contactMetaKeyword" />
+          <input type="hidden" name="redirectTo" value="/admin-contact" />
+          <div class="form-floating-label">
+            <textarea
+              id="editor-contactMetaKeyword"
+              name="content"
+              class="form-control"
+              placeholder=" "
+            >
 <%= contactMetaKeyword %></textarea
-          >
-          <label for="editor-contactMetaKeyword">Meta Keyword</label>
-        </div>
-        <button type="submit" class="btn btn-success mt-2">
-          Update Above Form Content
-        </button>
-      </form>
-    </div>
+            >
+            <label for="editor-contactMetaKeyword">Meta Keyword</label>
+          </div>
+          <button type="submit" class="btn btn-success mt-2">
+            Update Above Form Content
+          </button>
+        </form>
+      </div>
 
-    <!-- Required Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+      <!-- Required Scripts -->
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
 
-    <!-- Summernote Init Script -->
-    <script src="/js/script.js"></script>
-    <script>
-      $(document).ready(function () {
-        // Initialize editors
+      <!-- Summernote Init Script -->
+      <script src="/js/script.js"></script>
+      <script>
+        $(document).ready(function () {
+          // Initialize editors
 
-        $("#editor-topContactSection").summernote({
-          height: 200,
+          $("#editor-topContactSection").summernote({
+            height: 200,
+          });
         });
-      });
-    </script>
+      </script>
     </div>
-
-    
   </body>
 </html>

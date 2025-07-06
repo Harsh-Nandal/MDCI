@@ -3,29 +3,44 @@ const router = express.Router();
 const contactController = require('../controllers/contactController');
 const multer = require('multer');
 const path = require('path');
-const uploadDir = path.join(__dirname, '../uploads/contact');
 const fs = require('fs');
 const protect = require("../middleware/authMiddleware");
 
-
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, '../uploads/contact');
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true }); // creates uploads and contact folders if missing
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Multer storage config
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/contact');
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ storage });
+// Optional: Validate image type
+const fileFilter = function (req, file, cb) {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!['.jpg', '.jpeg', '.png', '.webp'].includes(ext)) {
+    return cb(new Error('Only image files are allowed!'));
+  }
+  cb(null, true);
+};
 
+const upload = multer({ storage, fileFilter });
 
-router.get('/admin-contact',protect, contactController.getContactSection);
-router.get('/contact', contactController.getAdminContactSection);
-router.post('/admin-contact', upload.array('images'), contactController.postContactSection);
+// Routes
+router.get('/admin-contact', protect, contactController.getAdminContactSection);
+router.get('/contact', contactController.getContactSection);
+
+router.post(
+  '/admin-contact',
+  upload.fields([{ name: 'images', maxCount: 3 }]),
+  contactController.postContactSection
+);
 
 module.exports = router;

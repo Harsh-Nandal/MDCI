@@ -5,7 +5,6 @@ const fs = require("fs");
 const path = require("path");
 const protect = require("../middleware/authMiddleware");
 
-
 const uploadDir = path.join(__dirname, "../uploads/courses");
 
 // Create the folder if it doesn't exist
@@ -18,7 +17,7 @@ const upload = multer({ dest: uploadDir });
 
 const courseController = require("../controllers/courseController");
 
-router.get("/admin-course",protect, courseController.renderCourseForm);
+router.get("/admin-course", protect, courseController.renderCourseForm);
 
 router.post(
   "/add-course",
@@ -29,7 +28,7 @@ router.post(
   courseController.addCourse
 );
 
-router.get("/edit-course/:id",protect, courseController.editCourseForm);
+router.get("/edit-course/:id", protect, courseController.editCourseForm);
 
 router.post(
   "/edit-course/:id",
@@ -41,5 +40,8 @@ router.post(
 );
 
 router.post("/delete-course/:id", courseController.deleteCourse);
+router.get("/admin-course/:courseId/delete-topic/:topicIndex", courseController.deleteTopic);
+
+
 
 module.exports = router;

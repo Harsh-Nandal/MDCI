@@ -55,5 +55,5 @@ exports.uploadImage = async (req, res) => {
 
 // Page to render image upload form
 exports.renderImageUploadPage = (req, res) => {
-  res.render('admin'); // make sure upload-image.ejs exists in /views
+  res.render('admin',{currentPath: req.path,}); // make sure upload-image.ejs exists in /views
 };

@@ -2,6 +2,11 @@
 <html lang="en">
   <head>
     <%- include('../partials/head') %>
+    <!-- Use filled icon set (if you want ph-fill) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/style.css"
+    />
   </head>
   <body>
     <!--==================== Preloader Start ====================-->
@@ -16,7 +21,7 @@
 
     <!-- ============================ Sidebar Start ============================ -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" style="background-color: aliceblue">
       <!-- sidebar close btn -->
       <button
         type="button"
@@ -30,7 +35,7 @@
         href="/admin/dashboard"
         class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10"
       >
-        <img src="/logobluepng.png" alt="Logo" />
+        <img src="<%= headerImageUrl %>" alt="Logo" />
       </a>
 
       <div class="sidebar-menu-wrapper overflow-y-auto scroll-sm">
@@ -117,7 +122,10 @@
               </a>
             </li>
             <li class="sidebar-menu__item">
-              <a href="/admin/student/fee-structure" class="sidebar-menu__link">
+              <a
+                href="/admin/student/fees-structure"
+                class="sidebar-menu__link"
+              >
                 <span class="icon"><i class="ph ph-coins"></i></span>
                 <span class="text">Fee-Structure</span>
               </a>
@@ -151,6 +159,22 @@
         </div>
       </div>
     </aside>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const dropdownToggles = document.querySelectorAll(
+          ".sidebar-menu__item.has-dropdown > a"
+        );
+
+        dropdownToggles.forEach(function (toggle) {
+          toggle.addEventListener("click", function (e) {
+            e.preventDefault(); // prevent default anchor behavior
+            const parentLi = this.closest(".sidebar-menu__item");
+            parentLi.classList.toggle("open");
+          });
+        });
+      });
+    </script>
+
     <!-- ============================ Sidebar End  ============================ -->
 
     <div class="dashboard-main-wrapper">
@@ -190,138 +214,41 @@
           <div class="col-lg-12">
             <!-- Widgets Start -->
             <div class="row gy-4">
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">155</h4>
-                    <span class="text-gray-600">Graphic Designing</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-600 text-white text-2xl"
-                        ><i class="ph-fill ph-pen-nib"></i
-                      ></span>
-                      <div
-                        id="graphic-design"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
+              <%
+  const stats = [
+    { count: designCount, label: "Graphic Designing", icon: "ph-pen-nib", color: "bg-main-600" },
+    { count: developmentCount, label: "Development", icon: "ph-code", color: "bg-main-two-600" },
+    { count: marketingCount, label: "Digital Marketing", icon: "ph-megaphone", color: "bg-purple-600" },
+    { count: otherCount, label: "Others", icon: "ph-users-three", color: "bg-warning-600" },
+    { count: totalUniversities, label: "Total Universities", icon: "ph-buildings", color: "bg-main-600" },
+    { count: totalCourses, label: "Total Courses", icon: "ph-books", color: "bg-main-two-600" },
+    { count: totalEnrollments, label: "Total Students", icon: "ph-graduation-cap", color: "bg-purple-600" },
+    { count: totalCouncilList, label: "Council List", icon: "ph-users", color: "bg-green-600" },
+    { count: totalGetInTouch, label: "Get In Touch", icon: "ph-phone-call", color: "bg-blue-600" },
+    { count: totalEnrollmentRequests, label: "Enrollment Requests", icon: "ph-file-text", color: "bg-red-600" }
+  ];
+%>
+
+
+              <div class="row">
+                <% stats.forEach((item) => { %>
+                <div class="col-xxl-3 col-sm-6 col-lg-4 mb-4 mt-4">
+                  <div class="card shadow-sm border-0">
+                    <div class="card-body text-center ">
+                      <div class="mb-3">
+                        <span
+                          class="d-inline-flex align-items-center justify-content-center rounded-circle <%= item.color %> text-white"
+                          style="width: 60px; height: 60px; font-size: 24px"
+                        >
+                          <i class="ph-fill <%= item.icon %>"></i>
+                        </span>
+                      </div>
+                      <h4 class="mb-1 text-dark fw-bold"><%= item.count %></h4>
+                      <p class="text-muted mb-0"><%= item.label %></p>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">39</h4>
-                    <span class="text-gray-600">Web Development</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"
-                        ><i class="ph-fill ph-code"></i
-                      ></span>
-                      <div
-                        id="web-dev"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">25</h4>
-                    <span class="text-gray-600">Digital Marketing</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl"
-                      >
-                        <i class="ph-fill ph-megaphone"></i
-                      ></span>
-                      <div
-                        id="digital-marketing"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">18</h4>
-                    <span class="text-gray-600">Others</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-warning-600 text-white text-2xl"
-                        ><i class="ph-fill ph-users-three"></i
-                      ></span>
-                      <div
-                        id="others"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-12">
-            <!-- Widgets Start -->
-            <div class="row gy-4">
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">2</h4>
-                    <span class="text-gray-600">Total Colleges</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-600 text-white text-2xl"
-                        ><i class="ph-fill ph-buildings"></i
-                      ></span>
-                      <div
-                        id="total-colleges"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">9</h4>
-                    <span class="text-gray-600">Total Courses</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-main-two-600 text-white text-2xl"
-                        ><i class="ph-fill ph-books"></i
-                      ></span>
-                      <div
-                        id="total-courses"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xxl-3 col-sm-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="mb-2">214</h4>
-                    <span class="text-gray-600">Total Students</span>
-                    <div class="flex-between gap-8 mt-16">
-                      <span
-                        class="flex-shrink-0 w-48 h-48 flex-center rounded-circle bg-purple-600 text-white text-2xl"
-                      >
-                        <i class="ph-fill ph-graduation-cap"></i
-                      ></span>
-                      <div
-                        id="total-students"
-                        class="remove-tooltip-title rounded-tooltip-value"
-                      ></div>
-                    </div>
-                  </div>
-                </div>
+                <% }); %>
               </div>
             </div>
           </div>
@@ -398,7 +325,7 @@
         }
       }
 
-      // Create charts for each dashboard box
+      // Existing charts
       createChart("graphic-design", "#2FB2AB");
       createChart("web-dev", "#27CFA7");
       createChart("digital-marketing", "#6142FF");
@@ -406,6 +333,11 @@
       createChart("total-colleges", "#2FB2AB");
       createChart("total-courses", "#27CFA7");
       createChart("total-students", "#6142FF");
+
+      // ✅ New charts
+      createChart("council-list", "#28C76F");
+      createChart("get-in-touch", "#2196F3");
+      createChart("enrollment-requests", "#EA5455");
     </script>
   </body>
 </html>

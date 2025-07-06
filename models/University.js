@@ -13,6 +13,8 @@ const universitySchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  image: String, // ✅ added image field
+
   location: {
     type: String,
   },
@@ -57,7 +59,6 @@ const universitySchema = new mongoose.Schema({
         duration: String,
       },
     },
-    
   ],
   reviews: [
     {

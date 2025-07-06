@@ -6,7 +6,7 @@ const protect = require("../middleware/authMiddleware");
 
 router.get("/admin/enrollment-list",protect, async (req, res) => {
   const enrollments = await Enrollment.find().sort({ createdAt: -1 });
-  res.render("admin/enrollment-list", { enrollments });
+  res.render("admin/enrollment-list", { enrollments,currentPath: req.path, });
 });
 router.post("/admin/enrollment/:id/delete", async (req, res) => {
   await Enrollment.findByIdAndDelete(req.params.id);
@@ -55,7 +55,7 @@ router.post("/contact-inquiry", async (req, res) => {
 });
 router.get("/admin/get-in-touch-list",protect, async (req, res) => {
   const inquiries = await ContactInquiry.find().sort({ createdAt: -1 });
-  res.render("admin/get-in-touch", { inquiries });
+  res.render("admin/get-in-touch", { inquiries,currentPath: req.path, });
 });
 router.post("/admin/get-in-touch/:id/delete", async (req, res) => {
   await ContactInquiry.findByIdAndDelete(req.params.id);

@@ -21,11 +21,11 @@
             type="button"
             class="toggle-btn d-xl-none d-flex text-26 text-gray-500"
           >
-            <i class="ph ph-list"></i>
+            <i class="ph ph-list"></i>6
           </button>
           <!-- Toggle Button End -->
 
-          <h1>University </h1>
+          <h1>University</h1>
         </div>
 
         <div class="flex-align gap-16">
@@ -52,6 +52,7 @@
           action="/admin/add-university"
           method="POST"
           id="addForm"
+          enctype="multipart/form-data"
           class="border p-4 mb-4"
         >
           <div class="form-row">
@@ -71,6 +72,15 @@
             <div class="form-group col-md-3">
               <label>Enrolled</label>
               <input type="number" name="enrolled" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label>University Image</label>
+              <input
+                type="file"
+                name="image"
+                class="form-control-file"
+                accept="image/*"
+              />
             </div>
           </div>
           <div class="form-group">
@@ -112,6 +122,7 @@
         <table class="table table-bordered table-hover">
           <thead class="thead-dark">
             <tr>
+              <th>Image</th>
               <th>Name</th>
               <th>Rating</th>
               <th>Enrolled</th>
@@ -122,6 +133,22 @@
           <tbody>
             <% universities.forEach((uni) => { %>
             <tr>
+              <td>
+                <% if (uni.image) { %>
+                <img
+                  src="<%= uni.image %>"
+                  alt="University Image"
+                  style="
+                    width: 90px;
+                    height: 60px;
+                    object-fit: contain;
+                    border-radius: 6px;
+                  "
+                />
+                <% } else { %>
+                <span class="text-muted">No Image</span>
+                <% } %>
+              </td>
               <td><%= uni.name %></td>
               <td><%= uni.rating %></td>
               <td><%= uni.enrolled %></td>

@@ -3,7 +3,7 @@ const Event = require("../models/Event");
 exports.renderEventForm = async (req, res) => {
   try {
     const events = await Event.find().sort({ eventDate: -1 }); // ✅ Get all events
-    res.render("admin/admin-event", { events });
+    res.render("admin/admin-event", { events, currentPath: req.path, });
   } catch (error) {
     console.error("Error rendering event form:", error);
     res.status(500).send("Internal Server Error");
@@ -56,11 +56,11 @@ exports.createEvent = async (req, res) => {
 
 exports.listEvents = async (req, res) => {
   const events = await Event.find().sort({ eventDate: -1 });
-  res.render("event", { events });
+  res.render("event", { events, currentPath: req.path, });
 };
 exports.editEventForm = async (req, res) => {
   const event = await Event.findById(req.params.id);
-  res.render("admin/edit-event", { event });
+  res.render("admin/edit-event", { event,currentPath: req.path, });
 };
 
 exports.updateEvent = async (req, res) => {

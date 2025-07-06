@@ -7,7 +7,6 @@ const path = require("path");
 const fs = require("fs");
 const protect = require("../middleware/authMiddleware");
 
-
 // Upload folder setup
 const uploadPath = path.join(__dirname, "../uploads/students");
 if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
@@ -23,12 +22,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // 🚀 Show all students + form
-router.get("/admin/student/enroll",protect, async (req, res) => {
+router.get("/admin/student/enroll", protect, async (req, res) => {
   const students = await Student.find()
     .populate("course")
     .sort({ createdAt: -1 });
   const courses = await Course.find();
-  res.render("admin/student-enroll", { students, courses });
+  res.render("admin/student-enroll", { students, courses,currentPath: req.path, });
 });
 
 // ✅ Handle new student creation
@@ -59,11 +58,11 @@ router.post("/admin/student/delete/:id", async (req, res) => {
 });
 
 // ✏️ Show edit student form
-router.get("/admin/student/edit/:id",protect, async (req, res) => {
+router.get("/admin/student/edit/:id", protect, async (req, res) => {
   const student = await Student.findById(req.params.id);
   const courses = await Course.find();
   if (!student) return res.status(404).send("Student not found");
-  res.render("admin/student-edit", { student, courses });
+  res.render("admin/student-edit", { student, courses,currentPath: req.path, });
 });
 
 // ✅ Handle student update
@@ -94,75 +93,69 @@ router.post(
 );
 
 // ✨ Show fees form
-router.get("/admin/student/:id/fees",protect, async (req, res) => {
+router.get("/admin/student/:id/fees", protect, async (req, res) => {
   const student = await Student.findById(req.params.id);
   if (!student) return res.status(404).send("Student not found");
-  res.render("admin/student-fees", { student });
+  res.render("admin/student-fees", { student,currentPath: req.path, });
 });
 
 router.post("/admin/student/:id/fees", async (req, res) => {
-  const { totalFees, discountPercent, amountPaid, lastPaidDate, receiptNo } =
-    req.body;
+  const {
+    totalFees,
+    discountPercent,
+    payAmount,
+    lastPaidDate,
+    receiptNo
+  } = req.body;
 
   const total = parseFloat(totalFees) || 0;
   const discount = parseFloat(discountPercent) || 0;
   const discountAmount = (total * discount) / 100;
   const finalAmount = total - discountAmount;
-  const paid = parseFloat(amountPaid) || 0;
-  const dues = finalAmount - paid;
+
+  const payNow = parseFloat(payAmount) || 0;
 
   const student = await Student.findById(req.params.id);
   if (!student) return res.status(404).send("Student not found");
 
-  // Initialize fees & installments if missing
   if (!student.fees) student.fees = {};
   if (!student.fees.installments) student.fees.installments = [];
 
   const prevPaid = parseFloat(student.fees.amountPaid || 0);
-  const delta = paid - prevPaid;
+  const newTotalPaid = prevPaid + payNow;
+  const dues = finalAmount - newTotalPaid;
 
-  // ✅ FIRST PAYMENT (no installments yet)
-  if (
-    student.fees.installments.length === 0 &&
-    paid > 0 &&
-    lastPaidDate &&
-    receiptNo
-  ) {
+  // Store new installment if payment made
+  if (payNow > 0 && lastPaidDate && receiptNo) {
     student.fees.installments.push({
-      amount: paid,
+      amount: payNow,
       date: new Date(lastPaidDate),
       receiptNo,
     });
   }
 
-  // ✅ SUBSEQUENT PAYMENT (only add delta as installment)
-  else if (delta > 0 && lastPaidDate && receiptNo) {
-    student.fees.installments.push({
-      amount: delta,
-      date: new Date(lastPaidDate),
-      receiptNo,
-    });
+  // Only update totalFees and discount if first installment not paid
+  const isFirstInstallment = student.fees.installments.length <= 1;
+  if (isFirstInstallment) {
+    student.fees.totalFees = total;
+    student.fees.discountPercent = discount;
+    student.fees.discountAmount = discountAmount;
+    student.fees.finalAmount = finalAmount;
   }
 
-  // ✅ Update fees object
-  student.fees.totalFees = total;
-  student.fees.discountPercent = discount;
-  student.fees.discountAmount = discountAmount;
-  student.fees.finalAmount = finalAmount;
-  student.fees.amountPaid = paid;
+  student.fees.amountPaid = newTotalPaid;
   student.fees.dues = dues;
   student.fees.lastPaidDate = lastPaidDate || null;
   student.fees.receiptNo = receiptNo || "";
 
   await student.save();
-
   res.redirect("/admin/student/enroll");
 });
 
 // 💰 Fees structure table
-router.get("/admin/student/fees-structure",protect, async (req, res) => {
+router.get("/admin/student/fees-structure", protect, async (req, res) => {
   const students = await Student.find().populate("course").sort({ name: 1 });
-  res.render("admin/fees-Structure", { students });
+  res.render("admin/fees-Structure", { students,currentPath: req.path, });
 });
 
 module.exports = router;

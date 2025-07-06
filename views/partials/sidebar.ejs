@@ -8,9 +8,7 @@
 <div class="side-overlay"></div>
 <!--==================== Sidebar Overlay End ====================-->
 
-<!-- ============================ Sidebar Start ============================ -->
-
-<aside class="sidebar">
+<aside class="sidebar" style="background-color: aliceblue">
   <!-- sidebar close btn -->
   <button
     type="button"
@@ -18,89 +16,130 @@
   >
     <i class="ph ph-x"></i>
   </button>
-  <!-- sidebar close btn -->
 
   <a
     href="/admin/dashboard"
     class="sidebar__logo text-center p-20 position-sticky inset-block-start-0 bg-white w-100 z-1 pb-10"
   >
-    <img src="/logobluepng.png" alt="Logo" />
+    <img src="<%= headerImageUrl %>" alt="Logo" />
   </a>
 
   <div class="sidebar-menu-wrapper overflow-y-auto scroll-sm">
     <div class="p-20 pt-10">
       <ul class="sidebar-menu">
-        <li class="sidebar-menu__item">
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/dashboard' ? 'active' : '' %>"
+        >
           <a href="/admin/dashboard" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-squares-four"></i></span>
             <span class="text">Dashboard</span>
           </a>
         </li>
-        <li class="sidebar-menu__item has-dropdown">
+
+        <!-- Page Management Dropdown -->
+        <% let isPageManagement = [ '/edit-page', '/admin-aboutUs',
+        '/admin/universities', '/admin-contact', '/admin-gallery',
+        '/admin-terms&conditions', '/admin-privacyPolicy', '/admin-event',
+        '/edit-page/blogs' ].includes(currentPath); %>
+
+        <!-- Page Management Dropdown -->
+        <li
+          class="sidebar-menu__item has-dropdown <%= isPageManagement ? 'open active' : '' %>"
+        >
           <a href="javascript:void(0)" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-shield-check"></i></span>
             <span class="text">Page Management</span>
           </a>
+
           <!-- Submenu start -->
           <ul class="sidebar-submenu">
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/edit-page' ? 'active' : '' %>"
+            >
               <a href="/edit-page" class="sidebar-submenu__link">Home Page</a>
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-aboutUs' ? 'active' : '' %>"
+            >
               <a href="/admin-aboutUs" class="sidebar-submenu__link">About</a>
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin/universities' ? 'active' : '' %>"
+            >
               <a href="/admin/universities" class="sidebar-submenu__link"
                 >Universities</a
               >
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-contact' ? 'active' : '' %>"
+            >
               <a href="/admin-contact" class="sidebar-submenu__link"
                 >Contact Us</a
               >
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-gallery' ? 'active' : '' %>"
+            >
               <a href="/admin-gallery" class="sidebar-submenu__link">Gallery</a>
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-terms&conditions' ? 'active' : '' %>"
+            >
               <a href="/admin-terms&conditions" class="sidebar-submenu__link"
                 >Terms & Conditions</a
               >
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-privacyPolicy' ? 'active' : '' %>"
+            >
               <a href="/admin-privacyPolicy" class="sidebar-submenu__link"
                 >Privacy Policy</a
               >
             </li>
-            <li class="sidebar-submenu__item">
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/admin-event' ? 'active' : '' %>"
+            >
               <a href="/admin-event" class="sidebar-submenu__link">Events</a>
             </li>
-            <li class="sidebar-submenu__item">
-              <a href="/edit-page" class="sidebar-submenu__link">Blogs</a>
+            <li
+              class="sidebar-submenu__item <%= currentPath === '/edit-page/blogs' ? 'active' : '' %>"
+            >
+              <a href="/edit-page/blogs" class="sidebar-submenu__link">Blogs</a>
             </li>
           </ul>
           <!-- Submenu End -->
         </li>
-        <li class="sidebar-menu__item">
+
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin-course' ? 'active' : '' %>"
+        >
           <a href="/admin-course" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-graduation-cap"></i></span>
             <span class="text">Courses</span>
           </a>
         </li>
-        <li class="sidebar-menu__item">
+
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/student/enroll' ? 'active' : '' %>"
+        >
           <a href="/admin/student/enroll" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-users-three"></i></span>
             <span class="text">Students</span>
           </a>
         </li>
 
-        <li class="sidebar-menu__item">
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/subjects' ? 'active' : '' %>"
+        >
           <a href="/admin/subjects" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-books"></i></span>
             <span class="text">Subjects</span>
           </a>
         </li>
-        <li class="sidebar-menu__item">
+
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/student/fees-structure' ? 'active' : '' %>"
+        >
           <a href="/admin/student/fees-structure" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-coins"></i></span>
             <span class="text">Fee-Structure</span>
@@ -113,19 +152,27 @@
           ></span>
         </li>
 
-        <li class="sidebar-menu__item">
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/counsel-list' ? 'active' : '' %>"
+        >
           <a href="/admin/counsel-list" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-bookmarks"></i></span>
             <span class="text">Council List</span>
           </a>
         </li>
-        <li class="sidebar-menu__item">
+
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/get-in-touch-list' ? 'active' : '' %>"
+        >
           <a href="/admin/get-in-touch-list" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-chats-teardrop"></i></span>
             <span class="text">Get In Touch</span>
           </a>
         </li>
-        <li class="sidebar-menu__item">
+
+        <li
+          class="sidebar-menu__item <%= currentPath === '/admin/enrollment-list' ? 'active' : '' %>"
+        >
           <a href="/admin/enrollment-list" class="sidebar-menu__link">
             <span class="icon"><i class="ph ph-chart-bar"></i></span>
             <span class="text">Enrollment Request</span>
@@ -135,9 +182,6 @@
     </div>
   </div>
 </aside>
-<!-- ============================ Sidebar End  ============================ -->
-
-
 
 <!-- Jquery js -->
 <script src="/assets/js/jquery-3.7.1.min.js"></script>
@@ -168,52 +212,3 @@
 
 <!-- main js -->
 <script src="/assets/js/main.js"></script>
-
-<script>
-  function createChart(chartId, chartColor) {
-    const options = {
-      series: [
-        { name: "series1", data: [18, 25, 22, 40, 34, 55, 50, 60, 55, 65] },
-      ],
-      chart: {
-        type: "area",
-        width: 80,
-        height: 42,
-        sparkline: { enabled: true },
-        toolbar: { show: false },
-      },
-      dataLabels: { enabled: false },
-      stroke: { curve: "smooth", width: 1, colors: [chartColor] },
-      grid: { show: false },
-      fill: {
-        type: "gradient",
-        colors: [chartColor],
-        gradient: {
-          shade: "light",
-          type: "vertical",
-          opacityFrom: 0.5,
-          opacityTo: 0.3,
-          stops: [0, 100],
-        },
-      },
-      markers: { colors: [chartColor], size: 0, hover: { size: 8 } },
-      xaxis: { labels: { show: false }, tooltip: { enabled: false } },
-      yaxis: { labels: { show: false } },
-      tooltip: { x: { format: "dd/MM/yy HH:mm" } },
-    };
-
-    const chartEl = document.querySelector(`#${chartId}`);
-    if (chartEl) {
-      new ApexCharts(chartEl, options).render();
-    }
-  }
-
-  // Create charts for each dashboard box
-  createChart("graphic-design", "#2FB2AB");
-  createChart("web-dev", "#27CFA7");
-  createChart("digital-marketing", "#6142FF");
-  createChart("others", "#FA902F");
-  createChart("total-colleges", "#2FB2AB");
-  createChart("total-courses", "#27CFA7");
-  createChart("total-students", "#6142FF");
-</script>

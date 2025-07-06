@@ -6,7 +6,7 @@ const Image = require("../models/otherImages");
 exports.getMdciGallery = async (req, res) => {
   try {
     const galleryImages = await Image.find({ section: "MDCIGallery" }).sort({ _id: -1 });
-    res.render("admin/admin-gallery", { galleryImages });
+    res.render("admin/admin-gallery", { galleryImages, currentPath: req.path, });
   } catch (err) {
     console.error("Error loading MDCI gallery:", err);
     res.status(500).send("Internal Server Error");
