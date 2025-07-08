@@ -77,22 +77,23 @@ exports.getAdminContactSection = async (req, res) => {
   }
 };
 
+
+
 exports.postContactSection = async (req, res) => {
   const { id = [], name = [], heading = [], content = [] } = req.body;
-  const uploadedImages = Array.isArray(req.files.images)
-    ? req.files.images
-    : [];
 
   try {
     for (let i = 0; i < 3; i++) {
-      if (!name[i] || !heading[i] || !content[i]) continue; // Skip invalid rows
+      // ✅ Only check required fields: heading and content
+      if (!heading[i] || !content[i]) continue;
 
-      const imagePath = uploadedImages[i]
-        ? `/uploads/contact/${uploadedImages[i].filename}`
+      const imageFile = req.files[`image${i}`]?.[0]; // May be undefined
+      const imagePath = imageFile
+        ? `/uploads/contact/${imageFile.filename}`
         : undefined;
 
       const updateData = {
-        name: name[i],
+        name: name[i] || `Section ${i + 1}`, // fallback if name is missing
         heading: heading[i],
         content: content[i],
       };
@@ -104,7 +105,7 @@ exports.postContactSection = async (req, res) => {
       if (id[i]) {
         const oldDoc = await ContactSection.findById(id[i]);
         if (oldDoc?.imagePath && imagePath && oldDoc.imagePath !== imagePath) {
-          const fullPath = path.join(__dirname, '..', oldDoc.imagePath);
+          const fullPath = path.join(__dirname, "..", oldDoc.imagePath);
           if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
         }
         await ContactSection.findByIdAndUpdate(id[i], updateData);

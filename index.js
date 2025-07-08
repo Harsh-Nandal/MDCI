@@ -8,6 +8,7 @@ const session = require("express-session");
 
 const connectDB = require("./connectDB");
 const protect = require("./middleware/authMiddleware");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const University = require("./models/University");
 
 // Load environment variables
@@ -50,6 +51,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.set("env", "production");
 
 // Controllers
 const homeController = require("./controllers/homeController");
@@ -60,7 +62,6 @@ const placementImagesController = require("./controllers/PlacementImagesControll
 const termsConditionsController = require("./controllers/terms&conditionsController");
 const privacyPolicyController = require("./controllers/privacyPolicyController");
 const ourCoursesController = require("./controllers/ourCoursesController");
-const dashboardController = require("./controllers/dashboardController");
 
 // Route files
 const EnrollmentRoutes = require("./routes/enrollmentRoutes");
@@ -120,7 +121,6 @@ app.get("/university/colleges", async (req, res) => {
   res.render("university", { universities, currentPath: req.path });
 });
 
-app.get("/contact", (req, res) => res.render("contact"));
 app.get(
   "/terms&conditions",
   termsConditionsController.getTermsConditionsSection
@@ -182,12 +182,26 @@ app.use("/", EnrollmentRoutes);
 app.use("/", bannerInquiryRoutes);
 app.use("/admin", universityRoutes);
 app.use(aboutRoutes);
-app.use(contactRoutes);
+app.use("/", contactRoutes);
 app.use(adminRoutes);
 app.use(studentReviewRoutes);
 
+const marksRoutes = require("./routes/marksRoutes");
+app.use("/admin/marks", marksRoutes);
+
 const subjectRoutes = require("./routes/subjectRoutes");
 app.use(subjectRoutes);
+
+// ✅ Test Error Route
+app.get("/test-error", (req, res) => {
+  throw new Error("Test error from /test-error");
+});
+
+// Handle 404
+app.use(notFound);
+
+// Handle all other errors
+app.use(errorHandler);
 
 // Error handler
 app.use((err, req, res, next) => {

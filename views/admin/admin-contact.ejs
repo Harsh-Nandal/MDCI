@@ -127,53 +127,51 @@
       </div>
 
       <form method="POST" enctype="multipart/form-data" action="/admin-contact">
-  <div class="container mt-4">
-    <% for (let i = 0; i < 3; i++) { 
-      const section = contactSections[i] || { _id: '', name: '', heading: '', content: '', imagePath: '' }; 
-    %>
-      <input type="hidden" name="id[]" value="<%= section._id %>" />
-      <input type="hidden" name="name[]" value="<%= section.name %>" />
+        <div class="container mt-4">
+          <% for (let i = 0; i < 3; i++) { const section = contactSections[i] ||
+          { _id: '', name: '', heading: '', content: '', imagePath: '' }; %>
+          <input type="hidden" name="id[]" value="<%= section._id %>" />
+          <input type="hidden" name="name[]" value="<%= section.name %>" />
 
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label>Heading <%= i + 1 %></label>
-          <input
-            type="text"
-            class="form-control"
-            name="heading[]"
-            value="<%= section.heading %>"
-          />
-        </div>
-        <div class="col-md-4">
-          <label>Content <%= i + 1 %></label>
-          <input
-            type="text"
-            class="form-control"
-            name="content[]"
-            value="<%= section.content %>"
-          />
-        </div>
-        <div class="col-md-4">
-          <label>Image <%= i + 1 %></label>
-          <!-- FIXED: Removed [] from name -->
-          <input type="file" class="form-control" name="images" />
-          <% if (section.imagePath) { %>
-            <img
-              src="<%= section.imagePath %>"
-              width="60"
-              style="margin-top: 5px"
-            />
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label>Heading <%= i + 1 %></label>
+              <input
+                type="text"
+                class="form-control"
+                name="heading[]"
+                value="<%= section.heading %>"
+              />
+            </div>
+            <div class="col-md-4">
+              <label>Content <%= i + 1 %></label>
+              <input
+                type="text"
+                class="form-control"
+                name="content[]"
+                value="<%= section.content %>"
+              />
+            </div>
+            <div class="col-md-4">
+              <label>Image <%= i + 1 %></label>
+              <!-- ✅ Must match multer config: image0, image1, image2 -->
+              <input type="file" class="form-control" name="image<%= i %>" />
+              <% if (section.imagePath) { %>
+              <img
+                src="<%= section.imagePath %>"
+                width="60"
+                style="margin-top: 5px"
+              />
+              <% } %>
+            </div>
+          </div>
           <% } %>
+
+          <button type="submit" class="btn btn-primary mt-3">
+            Save Contact Section
+          </button>
         </div>
-      </div>
-    <% } %>
-
-    <button type="submit" class="btn btn-primary mt-3">
-      Save Contact Section
-    </button>
-  </div>
-</form>
-
+      </form>
 
       <br /><br />
 
