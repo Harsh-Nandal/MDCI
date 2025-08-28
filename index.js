@@ -25,6 +25,11 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+app.use((req, res, next) => {
+  res.locals.footerImageUrl = res.locals.footerImageUrl || "/Desinerz Academy_Light.png";
+  next();
+});
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),

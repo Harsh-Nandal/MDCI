@@ -757,8 +757,8 @@
     <!-- main content -->
 
     <!-- footer section -->
-        <%- include("partials/footer") %>
-
+    <%- include("partials/footer", { footerImageUrl: typeof footerImageUrl !==
+    "undefined" ? footerImageUrl : "/simpleImage.png" }) %>
 
     <!-- slick -->
 

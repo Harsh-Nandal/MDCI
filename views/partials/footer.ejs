@@ -50,7 +50,7 @@
             <div class="footer_top-left">
               <a href="/">
                 <img
-                  src="<%= footerImageUrl %>"
+                  src="<%= (typeof footerImageUrl !== 'undefined' && footerImageUrl) ? footerImageUrl : '/simpleImage.png' %>"
                   alt="Maharishi Dayanad Computer Institute"
                 />
               </a>

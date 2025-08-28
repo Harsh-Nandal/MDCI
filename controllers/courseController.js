@@ -3,18 +3,26 @@ const fs = require("fs");
 const path = require("path");
 const Category = require("../models/CourseCategory");
 
+// Default footer image (fallback)
+const defaultFooterImage = "/simpleImage.png";
 
 // Show add-course page with all existing courses
 exports.renderCourseForm = async (req, res) => {
   try {
     const courses = await Course.find().sort({ createdAt: -1 });
     const categories = await Category.find().sort("name"); // get all categories
-    res.render("admin/admin-course", { courses,categories, currentPath: req.path, });
+    res.render("admin/admin-course", {
+      courses,
+      categories,
+      currentPath: req.path,
+      footerImageUrl: defaultFooterImage,
+    });
   } catch (error) {
     console.error("Error loading course form:", error);
     res.status(500).send("Internal Server Error");
   }
 };
+
 exports.addCategory = async (req, res) => {
   const { name, icon } = req.body;
 
@@ -32,7 +40,6 @@ exports.addCategory = async (req, res) => {
   res.redirect("back");
 };
 
-
 exports.addCourse = async (req, res) => {
   try {
     const {
@@ -43,7 +50,7 @@ exports.addCourse = async (req, res) => {
       metaTitle,
       metaDescription,
       metaKeywords,
-      category, 
+      category,
     } = req.body;
 
     // Parse topics from simpler arrays
@@ -72,8 +79,7 @@ exports.addCourse = async (req, res) => {
       metaTitle,
       metaDescription,
       metaKeywords,
-        category, // ✅ ADDED
-
+      category,
     });
 
     await newCourse.save();
@@ -89,7 +95,11 @@ exports.editCourseForm = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) return res.redirect("/admin-course?error=notfound");
-    res.render("admin/edit-course", { course, currentPath: req.path, });
+    res.render("admin/edit-course", {
+      course,
+      currentPath: req.path,
+      footerImageUrl: defaultFooterImage,
+    });
   } catch (error) {
     console.error("Error loading course:", error);
     res.status(500).send("Internal Server Error");
@@ -106,8 +116,7 @@ exports.updateCourse = async (req, res) => {
       metaTitle,
       metaDescription,
       metaKeywords,
-        category, // ✅ ADDED
-
+      category,
     } = req.body;
 
     const names = req.body.topicNames || [];
@@ -149,9 +158,8 @@ exports.updateCourse = async (req, res) => {
     course.metaTitle = metaTitle;
     course.metaDescription = metaDescription;
     course.metaKeywords = metaKeywords;
-    course.topics = parsedTopics; 
-    course.category =   category; // ✅ ADDED
-// Replace all topics with the new array
+    course.topics = parsedTopics;
+    course.category = category;
 
     await course.save();
     res.redirect("/admin-course");
@@ -185,6 +193,7 @@ exports.deleteCourse = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 exports.deleteTopic = async (req, res) => {
   try {
     const { courseId, topicIndex } = req.params;
@@ -205,14 +214,13 @@ exports.deleteTopic = async (req, res) => {
   }
 };
 
-
-exports.getCourses = async (req, res) => {
+exports.getCourses = async (req, res, next) => {
   try {
     const allCourses = await Course.find();
 
     const groupedCourses = {};
 
-    allCourses.forEach(course => {
+    allCourses.forEach((course) => {
       const category = course.category || "Others";
       if (!groupedCourses[category]) {
         groupedCourses[category] = [];
@@ -220,10 +228,12 @@ exports.getCourses = async (req, res) => {
       groupedCourses[category].push(course);
     });
 
-    res.render("ourCourses", { groupedCourses, currentPath: req.path, }); // your EJS view
+    res.render("ourCourses", {
+      groupedCourses,
+      currentPath: req.path,
+      footerImageUrl: defaultFooterImage,
+    });
   } catch (err) {
-        next(err)
-
+    next(err);
   }
 };
-
