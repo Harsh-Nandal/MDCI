@@ -49,8 +49,8 @@ router.post("/contact-inquiry", async (req, res) => {
     // If regular form POST:
     res.redirect("/");
   } catch (err) {
-    console.error("Contact inquiry error:", err);
-    res.status(500).send("Something went wrong");
+        next(err)
+
   }
 });
 router.get("/admin/get-in-touch-list",protect, async (req, res) => {

@@ -8,8 +8,8 @@ exports.getMdciGallery = async (req, res) => {
     const galleryImages = await Image.find({ section: "MDCIGallery" }).sort({ _id: -1 });
     res.render("admin/admin-gallery", { galleryImages, currentPath: req.path, });
   } catch (err) {
-    console.error("Error loading MDCI gallery:", err);
-    res.status(500).send("Internal Server Error");
+        next(err)
+
   }
 };
 
@@ -28,8 +28,8 @@ exports.uploadMdciGalleryImages = async (req, res) => {
     await Image.insertMany(uploaded);
     res.redirect("/admin-gallery");
   } catch (err) {
-    console.error("Error uploading MDCI images:", err);
-    res.status(500).send("Error uploading images.");
+        next(err)
+
   }
 };
 
@@ -49,7 +49,7 @@ exports.deleteMdciGalleryImage = async (req, res) => {
     await Image.findByIdAndDelete(req.params.id);
     res.redirect("/admin-gallery");
   } catch (err) {
-    console.error("Error deleting MDCI image:", err);
-    res.status(500).send("Error deleting image.");
+        next(err)
+
   }
 };

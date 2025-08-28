@@ -68,8 +68,8 @@ exports.submitMarks = async (req, res) => {
 
     res.redirect("/admin/marks/select"); // or any success page
   } catch (err) {
-    console.error("Error submitting marks:", err);
-    res.status(500).send("Something went wrong.");
+        next(err)
+
   }
 };
 exports.renderCertificate = async (req, res) => {

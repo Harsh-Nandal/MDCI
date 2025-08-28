@@ -39,8 +39,7 @@ exports.getContactSection = async (req, res) => {
       currentPath: req.path,
     });
   } catch (err) {
-    console.error("Error fetching contact section:", err);
-    res.status(500).send("Server error");
+    next(err);
   }
 };
 
@@ -72,8 +71,7 @@ exports.getAdminContactSection = async (req, res) => {
       currentPath: req.path,
     });
   } catch (err) {
-    console.error("Error fetching contact section:", err);
-    res.status(500).send("Server error");
+    next(err)
   }
 };
 
@@ -116,7 +114,6 @@ exports.postContactSection = async (req, res) => {
 
     res.redirect("/admin-contact");
   } catch (err) {
-    console.error("Error updating contact sections:", err);
-    res.status(500).send("Internal Server Error");
+    next(err)
   }
 };

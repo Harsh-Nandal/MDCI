@@ -29,8 +29,8 @@ exports.getAdminprivacyPolicySection = async (req, res) => {
       privacyPolicySection: privacyPolicySection?.html || "",
     });
   } catch (err) {
-    console.error("Error fetching privacy policy section:", err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };
 exports.getprivacyPolicySection = async (req, res) => {
@@ -58,8 +58,8 @@ exports.getprivacyPolicySection = async (req, res) => {
       privacyPolicySection: privacyPolicySection?.html || "",
     });
   } catch (err) {
-    console.error("Error fetching privacy policy section:", err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };
 

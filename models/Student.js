@@ -3,34 +3,106 @@ const bcrypt = require("bcrypt");
 
 const studentSchema = new mongoose.Schema(
   {
-    regNo: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    dob: { type: Date, required: true },
-    imagePath: { type: String },
-    fatherName: { type: String },
-    gender: { type: String },
-    bloodGroup: { type: String },
-    contactNo: { type: String },
-    email: { type: String, required: true, unique: true }, // ✅ Required + Unique
-    aadharNo: { type: String },
-    fatherOccupation: { type: String },
-    motherName: { type: String },
-    motherOccupation: { type: String },
-    parentsNo: { type: String },
-    qualification: { type: String },
-    address: { type: String },
-    maritalStatus: { type: String },
-    studentOccupation: { type: String },
-    dateOfAdmission: { type: Date },
-    referenceBy: { type: String },
-    password: { type: String, required: true }, // ✅ Password required
+    regNo: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    dob: {
+      type: Date,
+      required: true,
+    },
+    imagePath: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      trim: true,
+    },
+    bloodGroup: {
+      type: String,
+      trim: true,
+    },
+    contactNo: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    aadharNo: {
+      type: String,
+      trim: true,
+    },
+    fatherName: {
+      type: String,
+      trim: true,
+    },
+    fatherOccupation: {
+      type: String,
+      trim: true,
+    },
+    motherName: {
+      type: String,
+      trim: true,
+    },
+    motherOccupation: {
+      type: String,
+      trim: true,
+    },
+    parentsNo: {
+      type: String,
+      trim: true,
+    },
+    qualification: {
+      type: String,
+      trim: true,
+    },
+    address: {
+      type: String,
+      trim: true,
+    },
+    maritalStatus: {
+      type: String,
+      trim: true,
+    },
+    studentOccupation: {
+      type: String,
+      trim: true,
+    },
+    dateOfAdmission: {
+      type: Date,
+    },
+    referenceBy: {
+      type: String,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
 
+    
+
+    // ✅ Course Reference
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true,
+      index: true,
     },
 
+    // ✅ Fee Structure
     fees: {
       receiptNo: { type: String, default: "" },
       totalFees: { type: Number, default: 0 },
@@ -50,11 +122,11 @@ const studentSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // ✅ createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-// ✅ Hash password before save
+// ✅ Hash password before saving
 studentSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
@@ -65,7 +137,7 @@ studentSchema.pre("save", async function (next) {
   }
 });
 
-// ✅ Compare entered password with hashed
+// ✅ Compare password method
 studentSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

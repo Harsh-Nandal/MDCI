@@ -48,8 +48,8 @@ exports.uploadImage = async (req, res) => {
     await config.save();
     res.redirect('/edit-page');
   } catch (err) {
-    console.error('Image Upload Error:', err);
-    res.status(500).send('Server error');
+        next(err)
+
   }
 };
 

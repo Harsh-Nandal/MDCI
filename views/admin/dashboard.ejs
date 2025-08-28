@@ -3,10 +3,15 @@
   <head>
     <%- include('../partials/head') %>
     <!-- Use filled icon set (if you want ph-fill) -->
+    <!-- Font Awesome 6 Free -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/style.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4C+XqgIq6rQd9v/z3D0h+OAEUDFClBzQz+3iZvmX3h8NIRbC9+/i5U3swVeZVjcbG84JQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
+    <script src="/assets/js/phosphor-icon.js"></script>
   </head>
   <body>
     <!--==================== Preloader Start ====================-->
@@ -210,48 +215,32 @@
       </div>
 
       <div class="dashboard-body">
-        <div class="row gy-4">
-          <div class="col-lg-12">
-            <!-- Widgets Start -->
-            <div class="row gy-4">
-              <%
-  const stats = [
-    { count: designCount, label: "Graphic Designing", icon: "ph-pen-nib", color: "bg-main-600" },
-    { count: developmentCount, label: "Development", icon: "ph-code", color: "bg-main-two-600" },
-    { count: marketingCount, label: "Digital Marketing", icon: "ph-megaphone", color: "bg-purple-600" },
-    { count: otherCount, label: "Others", icon: "ph-users-three", color: "bg-warning-600" },
-    { count: totalUniversities, label: "Total Universities", icon: "ph-buildings", color: "bg-main-600" },
-    { count: totalCourses, label: "Total Courses", icon: "ph-books", color: "bg-main-two-600" },
-    { count: totalEnrollments, label: "Total Students", icon: "ph-graduation-cap", color: "bg-purple-600" },
-    { count: totalCouncilList, label: "Council List", icon: "ph-users", color: "bg-green-600" },
-    { count: totalGetInTouch, label: "Get In Touch", icon: "ph-phone-call", color: "bg-blue-600" },
-    { count: totalEnrollmentRequests, label: "Enrollment Requests", icon: "ph-file-text", color: "bg-red-600" }
-  ];
-%>
-
-
-              <div class="row">
-                <% stats.forEach((item) => { %>
-                <div class="col-xxl-3 col-sm-6 col-lg-4 mb-4 mt-4">
-                  <div class="card shadow-sm border-0">
-                    <div class="card-body text-center ">
-                      <div class="mb-3">
-                        <span
-                          class="d-inline-flex align-items-center justify-content-center rounded-circle <%= item.color %> text-white"
-                          style="width: 60px; height: 60px; font-size: 24px"
-                        >
-                          <i class="ph-fill <%= item.icon %>"></i>
-                        </span>
-                      </div>
-                      <h4 class="mb-1 text-dark fw-bold"><%= item.count %></h4>
-                      <p class="text-muted mb-0"><%= item.label %></p>
-                    </div>
-                  </div>
+        <div class="row">
+          <% stats.forEach((item) => { %>
+          <div class="col-xxl-3 col-sm-6 col-lg-3 mb-4 mt-4">
+            <div class="card shadow-sm border-0">
+              <div
+                class="card-body d-flex align-items-center justify-content-between"
+              >
+                <!-- Icon section -->
+                <div>
+                  <span
+                    class="d-inline-flex align-items-center justify-content-center rounded-circle <%= item.color %> text-white"
+                    style="width: 60px; height: 60px; font-size: 24px"
+                  >
+                    <i class="fa-solid <%= item.icon %>"></i>
+                  </span>
                 </div>
-                <% }); %>
+
+                <!-- Text content section -->
+                <div class="text-end">
+                  <h4 class="mb-1 text-dark fw-bold"><%= item.count %></h4>
+                  <p class="text-muted mb-0"><%= item.label %></p>
+                </div>
               </div>
             </div>
           </div>
+          <% }); %>
         </div>
       </div>
     </div>

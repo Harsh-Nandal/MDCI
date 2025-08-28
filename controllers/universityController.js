@@ -5,10 +5,12 @@ const University = require("../models/University");
 exports.getUniversities = async (req, res) => {
   try {
     const universities = await University.find();
-    res.render("admin/admin-university", { universities,currentPath: req.path, });
+    res.render("admin/admin-university", {
+      universities,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -18,18 +20,19 @@ exports.postAddUniversity = async (req, res) => {
     await University.create({ ...req.body, image });
     res.redirect("/admin/universities");
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
 exports.getEditUniversity = async (req, res) => {
   try {
     const university = await University.findById(req.params.id);
-    res.render("admin/admin-universityEdit", { university,currentPath: req.path, });
+    res.render("admin/admin-universityEdit", {
+      university,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -50,8 +53,7 @@ exports.postEditUniversity = async (req, res) => {
     await University.findByIdAndUpdate(req.params.id, req.body);
     res.redirect("/admin/universities");
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -64,8 +66,7 @@ exports.deleteUniversity = async (req, res) => {
     await University.findByIdAndDelete(req.params.id);
     res.redirect("/admin/universities");
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -73,10 +74,12 @@ exports.deleteUniversity = async (req, res) => {
 exports.getGalleryPage = async (req, res) => {
   try {
     const university = await University.findById(req.params.id);
-    res.render("admin/admin-universityGallery", { university ,currentPath: req.path,});
+    res.render("admin/admin-universityGallery", {
+      university,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -105,8 +108,7 @@ exports.deleteGalleryImage = async (req, res) => {
     }
     res.redirect(`/admin/university/${req.params.id}/gallery`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -114,10 +116,12 @@ exports.deleteGalleryImage = async (req, res) => {
 exports.getPartnerPage = async (req, res) => {
   try {
     const university = await University.findById(req.params.id);
-    res.render("admin/admin-universityPlacement", { university,currentPath: req.path, });
+    res.render("admin/admin-universityPlacement", {
+      university,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -146,8 +150,7 @@ exports.deletePartnerImage = async (req, res) => {
     }
     res.redirect(`/admin/university/${req.params.id}/partners`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -155,10 +158,12 @@ exports.deletePartnerImage = async (req, res) => {
 exports.getReviewPage = async (req, res) => {
   try {
     const university = await University.findById(req.params.id);
-    res.render("admin/admin-universityReviews", { university,currentPath: req.path, });
+    res.render("admin/admin-universityReviews", {
+      university,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -186,8 +191,7 @@ exports.addReview = async (req, res) => {
 
     res.redirect(`/admin/university/${universityId}/reviews`);
   } catch (err) {
-    console.error("Error adding review:", err);
-    res.status(500).send("Internal Server Error");
+    next(err);
   }
 };
 
@@ -205,8 +209,7 @@ exports.deleteReview = async (req, res) => {
     }
     res.redirect(`/admin/university/${req.params.id}/reviews`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -214,10 +217,12 @@ exports.deleteReview = async (req, res) => {
 exports.getCoursePage = async (req, res) => {
   try {
     const university = await University.findById(req.params.id);
-    res.render("admin/admin-universityCourses", { university,currentPath: req.path, });
+    res.render("admin/admin-universityCourses", {
+      university,
+      currentPath: req.path,
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -239,8 +244,7 @@ exports.addCourse = async (req, res) => {
     });
     res.redirect(`/admin/university/${req.params.id}/courses`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -258,8 +262,7 @@ exports.deleteCourse = async (req, res) => {
     }
     res.redirect(`/admin/university/${req.params.id}/courses`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    next(err);
   }
 };
 
@@ -301,7 +304,7 @@ exports.postEditCourse = async (req, res) => {
         fs.unlinkSync("." + course.course.image);
       }
     } catch (err) {
-      console.error("Image delete error:", err);
+      next(err);
     }
 
     course.course.image = "/uploads/universities/" + req.file.filename;

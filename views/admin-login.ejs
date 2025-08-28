@@ -154,60 +154,69 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6 h-100 form-col">
-        <div class="contact-form auth-form w-50 mx-auto">
-          <div class="auth-heading mb-4">
-            <h3 class="font-lora text-center">
-              Sign up <span class="text-blue">MDCI</span>
+      <div class="col-md-6 d-flex align-items-center justify-content-center">
+        <div class="contact-form auth-form w-100 px-4" style="max-width: 100%; ">
+          <div class="auth-heading text-center mb-4">
+            <h3 class="font-lora fw-bold">
+              Sign up <span class="text-primary">MDCI</span>
             </h3>
           </div>
-          <form action="/admin/login" method="post">
-            <div class="mb-24">
-              <label for="fname" class="form-label mb-8 h6">Name</label>
+
+          <form action="/admin/login" method="post" style="width: 100%;">
+            <!-- Username -->
+            <div class="mb-4">
+              <label for="fname" class="form-label fw-semibold">Name</label>
               <div class="position-relative">
-                <input
+                <input  
                   type="text"
-                  class="form-control py-11 ps-40"
+                  class="form-control ps-5 py-3 rounded"
                   id="fname"
                   name="username"
                   placeholder="Type your username"
                   required
                 />
                 <span
-                  class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"
+                  class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"
                 >
                   <i class="ph ph-user"></i>
                 </span>
               </div>
             </div>
 
-            <div class="mb-24">
-              <label for="current-password" class="form-label mb-8 h6"
+            <!-- Password -->
+            <div class="mb-4">
+              <label for="current-password" class="form-label fw-semibold"
                 >Password</label
               >
               <div class="position-relative">
                 <input
                   type="password"
-                  class="form-control py-11 ps-40"
+                  class="form-control ps-5 py-3 rounded"
                   id="current-password"
                   name="password"
                   placeholder="Enter password"
                   required
                 />
                 <span
-                  class="toggle-password position-absolute top-50 inset-inline-end-0 me-16 translate-middle-y ph ph-eye-slash"
-                ></span>
-                <span
-                  class="position-absolute top-50 translate-middle-y ms-16 text-gray-600 d-flex"
+                  class="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"
                 >
                   <i class="ph ph-lock"></i>
+                </span>
+                <span
+                  class="toggle-password position-absolute top-50 end-0 translate-middle-y pe-3 text-muted"
+                  role="button"
+                >
+                  <i class="ph ph-eye-slash"></i>
                 </span>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-main rounded-pill w-100">
-              Sign In
-            </button>
+            <!-- Submit Button -->
+            <div class="d-grid" style="width: 100%;text-align: center;">
+              <button type="submit" class="btn btn-primary py-2 rounded-pill" style="width: 300px;">
+                Sign In
+              </button>
+            </div>
           </form>
         </div>
       </div>

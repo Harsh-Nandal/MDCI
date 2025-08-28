@@ -20,8 +20,8 @@ exports.addStudentReview = async (req, res) => {
 
     res.redirect('/edit-page');
   } catch (err) {
-    console.error('Add Review Error:', err);
-    res.status(500).send('Server Error');
+        next(err)
+
   }
 };
 
@@ -30,7 +30,7 @@ exports.deleteStudentReview = async (req, res) => {
     await StudentReview.findByIdAndDelete(req.params.id);
     res.redirect('/edit-page');
   } catch (err) {
-    console.error('Delete Review Error:', err);
-    res.status(500).send('Server Error');
+        next(err)
+
   }
 };

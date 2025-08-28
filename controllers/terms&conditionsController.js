@@ -27,8 +27,8 @@ exports.getAdminTermsConditionsSection = async (req, res) => {
       siteConfig,
     });
   } catch (err) {
-    console.error("Error fetching admin terms & conditions section:", err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };
 
@@ -58,7 +58,7 @@ exports.getTermsConditionsSection = async (req, res) => {
       siteConfig,
     });
   } catch (err) {
-    console.error("Error fetching terms & conditions section:", err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };

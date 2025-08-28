@@ -19,7 +19,6 @@ exports.updateContent = async (req, res) => {
 
     res.redirect(redirectTo || '/edit-page');
   } catch (err) {
-    console.error('Error in saving:', err);
-    res.status(500).send('Server error');
+    next(err)
   }
 };

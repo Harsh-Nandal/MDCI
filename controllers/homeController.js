@@ -152,8 +152,8 @@ exports.renderHomePage = async (req, res) => {
       groupedCourses, // 👈 added this
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };
 
@@ -285,7 +285,7 @@ exports.renderAdminPage = async (req, res) => {
       faqs,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };

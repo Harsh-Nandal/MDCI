@@ -1,26 +1,26 @@
-// middlewares/errorMiddleware.js
-const path = require("path");
-
-exports.notFound = (req, res, next) => {
-  res.status(404);
-  res.render("error", {
+const notFound = (req, res, next) => {
+  res.status(404).render("error", {
     title: "Page Not Found",
     errorCode: 404,
     errorMessage: "The page you are looking for does not exist.",
-    currentPath: req.path,
+    currentPath: req.originalUrl,
+    error: {},
   });
 };
 
-exports.errorHandler = (err, req, res, next) => {
-  console.error("❌ Internal Error:", err.stack);
+const errorHandler = (err, req, res, next) => {
+  console.error("🔥 Global Error:", err);
 
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  const isAdmin = req.originalUrl.startsWith("/admin");
+  const view = isAdmin ? "admin/error" : "error";
 
-  res.status(statusCode);
-  res.render("error", {
-    title: "Server Error",
-    errorCode: statusCode,
-    errorMessage: err.message || "Something went wrong.",
-    currentPath: req.path,
+  res.status(500).render(view, {
+    title: isAdmin ? "Admin Error" : "Error",
+    errorCode: 500,
+    errorMessage: err.message || "Something went wrong!",
+    currentPath: req.originalUrl,
+    error: process.env.NODE_ENV === "development" ? err : {},
   });
 };
+
+module.exports = { notFound, errorHandler };

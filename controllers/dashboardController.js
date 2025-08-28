@@ -5,101 +5,114 @@ const Course = require("../models/Course");
 const BannerInquiry = require("../models/BannerInquiry");
 const ContactInquiry = require("../models/ContactInquiry");
 const EnrollmentInquiry = require("../models/Enrollment");
+const CourseCategory = require("../models/CourseCategory"); // ← ADDED
 
 // ================= Admin Dashboard =================
-const getAdminDashboard = async (req, res) => {
+const getAdminDashboard = async (req, res, next) => {
   try {
-    const courses = await Course.find();
+    const students = await Student.find().populate("course");
 
-    const categoryMap = {
-      "Govt Typing Exams": [],
-      "Computer Basics": [],
-      "Digital Marketing": [],
-      "Design Courses": [],
-      Development: [],
-    };
+    const categories = await CourseCategory.find();
 
-    courses.forEach((course) => {
-      const cat = course.category?.trim();
-      if (categoryMap[cat]) {
-        categoryMap[cat].push(course.name);
+    // Initialize dynamic categoryCounts
+    const categoryCounts = {};
+    categories.forEach((cat) => {
+      categoryCounts[cat.name.trim()] = 0;
+    });
+
+    // Count students per course category
+    students.forEach((student) => {
+      const courseCategory = student.course?.category?.trim();
+      if (courseCategory && categoryCounts.hasOwnProperty(courseCategory)) {
+        categoryCounts[courseCategory]++;
       }
     });
 
-    const typingCount = await Enrollment.countDocuments({
-      courseChoice: { $in: categoryMap["Govt Typing Exams"] },
-    });
+    // Other counts
+    const totalEnrollments = students.length || 0;
+    const totalUniversities = (await University.countDocuments()) || 0;
+    const totalCourses = (await Course.countDocuments()) || 0;
+    const totalCouncilList = (await BannerInquiry.countDocuments()) || 0;
+    const totalGetInTouch = (await ContactInquiry.countDocuments()) || 0;
+    const totalEnrollmentRequests =
+      (await EnrollmentInquiry.countDocuments()) || 0;
 
-    const basicsCount = await Enrollment.countDocuments({
-      courseChoice: { $in: categoryMap["Computer Basics"] },
-    });
+    // Dynamic stats for each course category
+    const stats = categories.map((cat) => ({
+      count: categoryCounts[cat.name.trim()] || 0,
+      label: cat.name,
+      icon: cat.icon || "fa-code", // fallback icon if missing
+      color: "bg-main-600", // optional: can customize by category later
+    }));
 
-    const marketingCount = await Enrollment.countDocuments({
-      courseChoice: { $in: categoryMap["Digital Marketing"] },
-    });
-
-    const developmentCount = await Enrollment.countDocuments({
-      courseChoice: { $in: categoryMap["Development"] },
-    });
-
-    const designCount = await Enrollment.countDocuments({
-      $or: [
-        { courseChoice: { $in: categoryMap["Design Courses"] } },
-        { courseChoice: { $regex: /ui[\s\/]?ux/i } },
-        { courseChoice: { $regex: /graphic/i } },
-      ],
-    });
-
-    const allKnownCourses = Object.values(categoryMap).flat();
-
-    const otherCount = await Enrollment.countDocuments({
-      $and: [
-        { courseChoice: { $nin: allKnownCourses } },
-        { courseChoice: { $not: /graphic|ui[\s\/]?ux/i } },
-      ],
-    });
-
-    const totalEnrollments = await Enrollment.countDocuments();
-    const totalUniversities = await University.countDocuments();
-    const totalCourses = await Course.countDocuments();
-    const totalCouncilList = await BannerInquiry.countDocuments();
-    const totalGetInTouch = await ContactInquiry.countDocuments();
-    const totalEnrollmentRequests = await EnrollmentInquiry.countDocuments();
+    // Additional static stats
+    stats.push(
+      {
+        count: totalUniversities,
+        label: "Total Universities",
+        icon: "fa-university",
+        color: "bg-main-600",
+      },
+      {
+        count: totalCourses,
+        label: "Total Courses",
+        icon: "fa-book",
+        color: "bg-main-two-600",
+      },
+      {
+        count: totalEnrollments,
+        label: "Total Students",
+        icon: "fa-user-graduate",
+        color: "bg-purple-600",
+      },
+      {
+        count: totalCouncilList,
+        label: "Council List",
+        icon: "fa-users",
+        color: "bg-green-600",
+      },
+      {
+        count: totalGetInTouch,
+        label: "Total Get In Touch",
+        icon: "fa-envelope-open-text",
+        color: "bg-main-two-600",
+      },
+      {
+        count: totalEnrollmentRequests,
+        label: "Total Enrollment Requests",
+        icon: "fa-user-edit",
+        color: "bg-warning-600",
+      }
+    );
 
     res.render("admin/dashboard", {
       currentPath: req.path,
-      designCount,
-      developmentCount,
-      marketingCount,
-      otherCount,
-      totalUniversities,
-      totalCourses,
-      totalEnrollments,
-      totalCouncilList,
-      totalGetInTouch,
-      totalEnrollmentRequests,
+      stats,
     });
   } catch (error) {
-    console.error("Admin Dashboard render error:", error);
-    res.status(500).send("Internal Server Error");
+    next(error);
   }
 };
 
 // ================= Student Dashboard =================
-const getStudentDashboard = async (req, res) => {
+const getStudentDashboard = async (req, res, next) => {
   try {
-    const student = await Student.findOne({ email: req.session.student.email }).populate("course");
+    const student = await Student.findOne({
+      email: req.session.student?.email,
+    }).populate("course");
 
-    if (!student) return res.status(404).send("Student not found");
-    console.log("Dashboard accessed, session:", req.session.student);
+    if (!student) {
+      const error = new Error("Student not found");
+      error.statusCode = 404;
+      throw error;
+    }
 
     res.render("studentdashboard", {
       student,
       currentPath: req.path,
     });
   } catch (err) {
-    console.error("Student dashboard error:", err);
-    res.status(500).send("Internal Server Error");
+    next(err);
   }
 };
 

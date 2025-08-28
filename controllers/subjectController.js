@@ -8,7 +8,8 @@ exports.getSubjects = async (req, res) => {
     const courses = await Course.find();
     res.render("admin/admin-subjects", { subjects, courses,currentPath: req.path, });
   } catch (err) {
-    res.status(500).send("Error loading subjects");
+        next(err)
+
   }
 };
 
@@ -19,9 +20,10 @@ exports.createSubject = async (req, res) => {
     await Subject.create({ name, subjectCode, description, course: courseId });
     res.redirect("/admin/subjects");
   } catch (err) {
-    res.status(500).send("Error creating subject");
-  }
+        next(err)
+
 };
+}
 
 // Delete subject
 exports.deleteSubject = async (req, res) => {
@@ -29,7 +31,8 @@ exports.deleteSubject = async (req, res) => {
     await Subject.findByIdAndDelete(req.params.id);
     res.redirect("/admin/subjects");
   } catch (err) {
-    res.status(500).send("Error deleting subject");
+        next(err)
+
   }
 };
 
@@ -45,7 +48,8 @@ exports.updateSubject = async (req, res) => {
     });
     res.redirect("/admin/subjects");
   } catch (err) {
-    res.status(500).send("Error updating subject");
+        next(err)
+
   }
 };
 // GET: Render edit page
@@ -57,7 +61,8 @@ exports.getEditSubject = async (req, res) => {
 
     res.render("admin/edit-subjects", { subject, courses,currentPath: req.path, });
   } catch (err) {
-    res.status(500).send("Error loading subject");
+        next(err)
+
   }
 };
 
@@ -75,6 +80,7 @@ exports.updateSubject = async (req, res) => {
 
     res.redirect("/admin/subjects");
   } catch (err) {
-    res.status(500).send("Error updating subject");
-  }
-};
+        next(err)
+
+}
+}

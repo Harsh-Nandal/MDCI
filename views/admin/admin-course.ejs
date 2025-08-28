@@ -153,6 +153,40 @@
         <!-- Collapsible Form -->
         <div class="collapse" id="addCourseForm">
           <div class="form-section">
+            <!-- 📝 Add New Category Form (Hidden by Default) -->
+            <!-- 🔘 Toggle Button -->
+            <div class="mb-2" style="width: 100%; text-align: center;">
+              <button
+                type="button"
+                class="btn btn-sm btn-info"
+                onclick="toggleCategoryForm()"
+              >
+                + Add New Category
+              </button>
+            </div>
+            <div
+              id="addCategoryForm"
+              style="display: none"
+              class="border p-3 rounded bg-light"
+            >
+              <form action="/admin/add-category" method="POST">
+                <div class="form-group">
+                  <label for="newCategory">New Category Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="newCategory"
+                    class="form-control"
+                    placeholder="Enter new category"
+                    required
+                  />
+                </div>
+
+                <button type="submit" class="btn btn-success btn-sm mt-2">
+                  Save Category
+                </button>
+              </form>
+            </div>
             <form
               action="/add-course"
               method="POST"
@@ -185,16 +219,14 @@
                 </div>
               </div>
 
-              <!-- ✅ Course Category -->
+              <!-- ✅ Course Category with Add Option -->
               <div class="form-group">
                 <label>Course Category</label>
                 <select name="category" class="form-control" required>
                   <option value="">Select a Category</option>
-                  <option value="Computer Basics">Computer Basics</option>
-                  <option value="Govt Typing Exams">Govt Typing Exams</option>
-                  <option value="Design Courses">Design Courses</option>
-                  <option value="Development">Development</option>
-                  <option value="Digital Marketing">Digital Marketing</option>
+                  <% categories.forEach((cat) => { %>
+                  <option value="<%= cat.name %>"><%= cat.name %></option>
+                  <% }) %>
                 </select>
               </div>
 
@@ -285,7 +317,7 @@
       </div>
 
       <div class="container-fluid page-wrapper">
-        <div class="py-4" style="text-align: center;">
+        <div class="py-4" style="text-align: center">
           <h2 class="mb-4">All Courses</h2>
         </div>
 
@@ -410,6 +442,12 @@
               document.getElementById(`delete-form-${courseId}`).submit();
             }
           });
+        }
+      </script>
+      <script>
+        function toggleCategoryForm() {
+          const form = document.getElementById("addCategoryForm");
+          form.style.display = form.style.display === "none" ? "block" : "none";
         }
       </script>
     </div>

@@ -18,6 +18,8 @@ const upload = multer({ dest: uploadDir });
 const courseController = require("../controllers/courseController");
 
 router.get("/admin-course", protect, courseController.renderCourseForm);
+router.post("/admin/add-category", courseController.addCategory);
+
 
 router.post(
   "/add-course",

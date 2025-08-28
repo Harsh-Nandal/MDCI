@@ -23,8 +23,8 @@ router.post("/banner-inquiry", async (req, res) => {
 
     res.redirect("/"); // redirect to home after submission
   } catch (err) {
-    console.error("Error saving banner inquiry:", err);
-    res.status(500).send("Something went wrong");
+        next(err)
+
   }
 });
 

@@ -93,8 +93,7 @@ exports.renderAdminPageAboutUs = async (req, res) => {
       latestMedia,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+    next(err)
   }
 };
 
@@ -191,7 +190,6 @@ exports.renderPageAboutUs = async (req, res) => {
       latestBottomMedia: parsedBottomMedia,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+    next(err);
   }
 };

@@ -22,7 +22,7 @@ module.exports = function(upload, uploadPath) {
         console.log('Old brochure deleted');
       }
     } catch (err) {
-      console.error('Error deleting old brochure:', err);
+      next(err);
     }
 
     // Rename uploaded file to fixed name 'brochure.pdf'

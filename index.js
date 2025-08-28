@@ -8,32 +8,29 @@ const session = require("express-session");
 
 const connectDB = require("./connectDB");
 const protect = require("./middleware/authMiddleware");
-const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware"); // ✅ Include errorHandler
 const University = require("./models/University");
 
-// Load environment variables
 dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Connect to DB
 connectDB();
 
-// Ensure upload directory exists
+// Ensure upload folder exists
 const uploadPath = path.join(__dirname, "public", "uploads", "placement");
+app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
+
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
-// Multer setup for placement images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
-// Session setup
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your_session_secret",
@@ -41,19 +38,19 @@ app.use(
     saveUninitialized: false,
   })
 );
+app.get("/test-error", (req, res) => {
+  throw new Error("Test error!");
+});
 
-// View engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.set("env", "production");
 
-// Controllers
+// Load Controllers and Routes
 const homeController = require("./controllers/homeController");
 const aboutController = require("./controllers/aboutController");
 const contentController = require("./controllers/contentController");
@@ -63,7 +60,6 @@ const termsConditionsController = require("./controllers/terms&conditionsControl
 const privacyPolicyController = require("./controllers/privacyPolicyController");
 const ourCoursesController = require("./controllers/ourCoursesController");
 
-// Route files
 const EnrollmentRoutes = require("./routes/enrollmentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const galleryRoutes = require("./routes/gallery");
@@ -82,12 +78,13 @@ const universityRoutes = require("./routes/universityRoutes");
 const bannerInquiryRoutes = require("./routes/bannerInquiryRoutes");
 const adminDashboardRoutes = require("./routes/adminDashboard");
 const studentDashboardRoutes = require("./routes/studentDashboard");
-
-// === Routes ===
+const marksRoutes = require("./routes/marksRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
 
 const SiteConfig = require("./models/SiteConfig");
 const Image = require("./models/Image");
 
+// Set global header image
 app.use(async (req, res, next) => {
   try {
     const config = await SiteConfig.findOne();
@@ -95,39 +92,37 @@ app.use(async (req, res, next) => {
 
     if (config?.headerImageId) {
       const image = await Image.findById(config.headerImageId);
-      if (image) {
-        headerImageUrl = image.url;
-      }
+      if (image) headerImageUrl = image.url;
     }
 
     res.locals.headerImageUrl = headerImageUrl;
     next();
   } catch (err) {
-    console.error("Error setting headerImageUrl:", err);
+    console.error("Header image error:", err);
     res.locals.headerImageUrl = "/simpleImage.png";
     next();
   }
 });
 
-// Static pages
+// Static routes
 app.get("/", homeController.renderHomePage);
 app.get("/edit-page", protect, homeController.renderAdminPage);
 app.get("/aboutUs", aboutController.renderPageAboutUs);
 app.get("/admin-aboutUs", protect, aboutController.renderAdminPageAboutUs);
 app.get("/ourCourses", ourCoursesController.renderOurCoursesPage);
 app.get("/ourCourses/:id", ourCoursesController.renderCourseDetailsPage);
-app.get("/university/colleges", async (req, res) => {
-  const universities = await University.find();
-  res.render("university", { universities, currentPath: req.path });
-});
-
+app.get("/gallery", (req, res) => res.render("gallery"));
 app.get(
   "/terms&conditions",
   termsConditionsController.getTermsConditionsSection
 );
 app.get("/privacyPolicy", privacyPolicyController.getprivacyPolicySection);
 
-// University detail pages
+app.get("/university/colleges", async (req, res) => {
+  const universities = await University.find();
+  res.render("university", { universities, currentPath: req.path });
+});
+
 app.get("/amityUniversity", (req, res) => res.render("amity_university"));
 app.get("/chitkaraUniversity", (req, res) => res.render("chitkara_university"));
 app.get("/kalingaUniversity", (req, res) => res.render("kalinga_university"));
@@ -139,20 +134,11 @@ app.get("/vivekanandUniversity", (req, res) =>
 );
 app.get("/LPUUniversity", (req, res) => res.render("LPU_university"));
 
-app.get("/gallery", (req, res) => res.render("gallery"));
-
+// Admin & other routes
 app.use("/admin", adminDashboardRoutes);
-app.use("/student", studentDashboardRoutes);
-
-// Placement Partner Images
-app.post(
-  "/placement-image",
-  upload.array("image", 10),
-  placementImagesController.uploadPlacementImages
-);
-app.post("/delete-image/:id", placementImagesController.deletePlacementImage);
-
-// Admin Terms & Privacy Policy Section
+app.use("/admin", universityRoutes);
+app.use("/admin/marks", marksRoutes);
+app.use("/admin/brochure", brochureController(upload, uploadPath));
 app.get(
   "/admin-terms&conditions",
   protect,
@@ -164,11 +150,7 @@ app.get(
   privacyPolicyController.getAdminprivacyPolicySection
 );
 
-// Update content
-app.post("/update-content", contentController.updateContent);
-
-// Use modular routes
-app.use("/admin/brochure", brochureController(upload, uploadPath));
+app.use("/student", studentDashboardRoutes);
 app.use("/", faqRoutes);
 app.use("/", mdciGalleryRoutes);
 app.use("/", logoImageRoutes);
@@ -180,34 +162,34 @@ app.use("/", eventRoutes);
 app.use("/", courseRoutes);
 app.use("/", EnrollmentRoutes);
 app.use("/", bannerInquiryRoutes);
-app.use("/admin", universityRoutes);
-app.use(aboutRoutes);
 app.use("/", contactRoutes);
+app.use(subjectRoutes);
+app.use(aboutRoutes);
 app.use(adminRoutes);
 app.use(studentReviewRoutes);
 
-const marksRoutes = require("./routes/marksRoutes");
-app.use("/admin/marks", marksRoutes);
+// Placement image routes
+app.post(
+  "/placement-image",
+  upload.array("image", 10),
+  placementImagesController.uploadPlacementImages
+);
+app.post("/delete-image/:id", placementImagesController.deletePlacementImage);
 
-const subjectRoutes = require("./routes/subjectRoutes");
-app.use(subjectRoutes);
+// Update CMS content
+app.post("/update-content", contentController.updateContent);
 
-// ✅ Test Error Route
+// ❌ Throw test error
 app.get("/test-error", (req, res) => {
   throw new Error("Test error from /test-error");
 });
-
-// Handle 404
-app.use(notFound);
-
-// Handle all other errors
-app.use(errorHandler);
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err);
-  res.status(500).send("Something went wrong!");
+app.get("/admin/test-error", (req, res) => {
+  throw new Error("Admin test error!");
 });
+
+// ✅ 404 and Error Handlers
+app.use(notFound);
+app.use(errorHandler); // ✅ Error middleware
 
 // Start server
 app.listen(port, () => {

@@ -47,8 +47,7 @@ const postAdminLogin = async (req, res) => {
 
     res.redirect("/admin/dashboard");
   } catch (err) {
-    console.error("Server error during admin login:", err);
-    res.status(500).send("Server error");
+    next(err);
   }
 };
 
@@ -94,8 +93,7 @@ const postStudentLogin = async (req, res) => {
     console.log("✅ Redirecting to dashboard...");
     res.redirect("/student/dashboard");
   } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).send("Internal Server Error");
+    next(err)
   }
 };
 

@@ -54,8 +54,8 @@ router.post('/upload-aboutMedia', upload.single('image'), async (req, res) => {
     await media.save();
     res.redirect('/admin-aboutUs');
   } catch (err) {
-    console.error('Upload Error:', err);
-    res.status(500).send('Internal Server Error');
+        next(err)
+
   }
 });
 

@@ -20,8 +20,8 @@ exports.renderOurCoursesPage = async (req, res) => {
       groupedCourses, // 👈 added this
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };
 
@@ -53,7 +53,7 @@ exports.renderCourseDetailsPage = async (req, res) => {
       currentPath: req.path, // 👈 added this
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
+        next(err)
+
   }
 };

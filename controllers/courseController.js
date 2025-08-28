@@ -1,17 +1,37 @@
 const Course = require("../models/Course");
 const fs = require("fs");
 const path = require("path");
+const Category = require("../models/CourseCategory");
+
 
 // Show add-course page with all existing courses
 exports.renderCourseForm = async (req, res) => {
   try {
     const courses = await Course.find().sort({ createdAt: -1 });
-    res.render("admin/admin-course", { courses, currentPath: req.path, });
+    const categories = await Category.find().sort("name"); // get all categories
+    res.render("admin/admin-course", { courses,categories, currentPath: req.path, });
   } catch (error) {
     console.error("Error loading course form:", error);
     res.status(500).send("Internal Server Error");
   }
 };
+exports.addCategory = async (req, res) => {
+  const { name, icon } = req.body;
+
+  if (!name?.trim()) {
+    return res.redirect("back");
+  }
+
+  const iconToSave = icon?.trim() || "fa-code"; // set default if empty
+
+  await Category.create({
+    name: name.trim(),
+    icon: iconToSave,
+  });
+
+  res.redirect("back");
+};
+
 
 exports.addCourse = async (req, res) => {
   try {
@@ -202,8 +222,8 @@ exports.getCourses = async (req, res) => {
 
     res.render("ourCourses", { groupedCourses, currentPath: req.path, }); // your EJS view
   } catch (err) {
-    console.error("Error loading courses:", err);
-    res.status(500).send("Server Error");
+        next(err)
+
   }
 };
 
