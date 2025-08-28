@@ -296,6 +296,9 @@ section.ad_banner p {
 .footer_top-left {
   gap: 32px;
 }
+.footer_top-left img{
+  width: 18rem;
+}
 
 .footer_heading {
   color: yellow;
