@@ -8,12 +8,18 @@ const session = require("express-session");
 
 const connectDB = require("./connectDB");
 const protect = require("./middleware/authMiddleware");
-const { notFound, errorHandler } = require("./middleware/errorMiddleware"); // ✅ Include errorHandler
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const University = require("./models/University");
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
+
+// ⬅️ Render/any PaaS requires this:
+const PORT = process.env.PORT || 3000;
+const HOST = "0.0.0.0";
+
+// If behind a proxy (Render), trust it (helps with secure cookies, IPs, etc.)
+app.set("trust proxy", 1);
 
 connectDB();
 
@@ -25,8 +31,10 @@ if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
 
+// default footer image (served from /public)
 app.use((req, res, next) => {
-  res.locals.footerImageUrl = res.locals.footerImageUrl || "/Desinerz Academy_Light.png";
+  res.locals.footerImageUrl =
+    res.locals.footerImageUrl || "/Desinerz Academy_Light.png";
   next();
 });
 
@@ -43,19 +51,23 @@ app.use(
     saveUninitialized: false,
   })
 );
-app.get("/test-error", (req, res) => {
-  throw new Error("Test error!");
-});
+
+// ✅ remove the earlier duplicate /test-error route
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve everything in /public at site root (e.g. /css, /uploads, etc.)
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Make sure /uploads also maps to /public/uploads explicitly
+app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
+
 app.set("env", "production");
 
-// Load Controllers and Routes
+// Controllers and Routes
 const homeController = require("./controllers/homeController");
 const aboutController = require("./controllers/aboutController");
 const contentController = require("./controllers/contentController");
@@ -109,7 +121,10 @@ app.use(async (req, res, next) => {
   }
 });
 
-// Static routes
+// Health check (useful on Render)
+app.get("/health", (req, res) => res.status(200).send("ok"));
+
+// Static pages
 app.get("/", homeController.renderHomePage);
 app.get("/edit-page", protect, homeController.renderAdminPage);
 app.get("/aboutUs", aboutController.renderPageAboutUs);
@@ -117,10 +132,7 @@ app.get("/admin-aboutUs", protect, aboutController.renderAdminPageAboutUs);
 app.get("/ourCourses", ourCoursesController.renderOurCoursesPage);
 app.get("/ourCourses/:id", ourCoursesController.renderCourseDetailsPage);
 app.get("/gallery", (req, res) => res.render("gallery"));
-app.get(
-  "/terms&conditions",
-  termsConditionsController.getTermsConditionsSection
-);
+app.get("/terms&conditions", termsConditionsController.getTermsConditionsSection);
 app.get("/privacyPolicy", privacyPolicyController.getprivacyPolicySection);
 
 app.get("/university/colleges", async (req, res) => {
@@ -184,19 +196,16 @@ app.post("/delete-image/:id", placementImagesController.deletePlacementImage);
 // Update CMS content
 app.post("/update-content", contentController.updateContent);
 
-// ❌ Throw test error
+// Single test-error route (kept one)
 app.get("/test-error", (req, res) => {
   throw new Error("Test error from /test-error");
 });
-app.get("/admin/test-error", (req, res) => {
-  throw new Error("Admin test error!");
-});
 
-// ✅ 404 and Error Handlers
+// 404 & Error handlers
 app.use(notFound);
-app.use(errorHandler); // ✅ Error middleware
+app.use(errorHandler);
 
-// Start server
-app.listen(port, () => {
-  console.log(`✅ Server running at http://localhost:${port}`);
+// Start server (PORT from env, bind to 0.0.0.0)
+app.listen(PORT, HOST, () => {
+  console.log(`✅ Server running at http://${HOST}:${PORT}`);
 });
