@@ -1,10 +1,58 @@
+// controllers/courseController.js
 const Course = require("../models/Course");
 const fs = require("fs");
 const path = require("path");
 const Category = require("../models/CourseCategory");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config(); // if not already loaded in your app
+
+// Cloudinary config - update env var names if yours differ
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_API_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY || process.env.CLOUDINARY_KEY || process.env.API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET || process.env.CLOUDINARY_SECRET || process.env.API_SECRET,
+  secure: true,
+});
 
 // Default footer image (fallback)
 const defaultFooterImage = "/simpleImage.png";
+
+// Helpers
+async function uploadToCloudinary(localFilePath, folder = "courses", resource_type = "image") {
+  if (!fs.existsSync(localFilePath)) {
+    throw new Error("Local file not found: " + localFilePath);
+  }
+
+  const options = {
+    folder,
+    use_filename: true,
+    unique_filename: true,
+  };
+
+  // for non-image files (pdf) allow auto/raw upload
+  if (resource_type === "raw" || resource_type === "auto") {
+    // cloudinary can auto-detect; we still pass resource_type if needed in destroy later
+    options.resource_type = resource_type;
+  }
+
+  const result = await cloudinary.uploader.upload(localFilePath, options);
+  // remove local temp file
+  try {
+    fs.unlinkSync(localFilePath);
+  } catch (e) {
+    console.warn("Failed to remove local file:", localFilePath, e.message);
+  }
+  return { url: result.secure_url, public_id: result.public_id, resource_type: result.resource_type || "image" };
+}
+
+async function deleteFromCloudinary(public_id, resource_type = "image") {
+  if (!public_id) return;
+  try {
+    await cloudinary.uploader.destroy(public_id, { resource_type });
+  } catch (err) {
+    console.warn("Cloudinary delete failed for:", public_id, err.message);
+  }
+}
 
 // Show add-course page with all existing courses
 exports.renderCourseForm = async (req, res) => {
@@ -57,14 +105,42 @@ exports.addCourse = async (req, res) => {
     const names = req.body.topicNames || [];
     const durations = req.body.topicDurations || [];
 
-    const parsedTopics = names.map((name, index) => ({
-      name,
+    const parsedTopics = names.map((tName, index) => ({
+      name: tName,
       duration: durations[index] || "",
     }));
 
-    // File paths
-    const courseImageFile = req.files?.courseImage?.[0]?.filename;
-    const pdfFile = req.files?.pdf?.[0]?.filename;
+    // File inputs (multer with fields like courseImage, pdf)
+    const courseImageFileObj = req.files?.courseImage?.[0]; // multer file object
+    const pdfFileObj = req.files?.pdf?.[0];
+
+    let courseImageUrl;
+    let pdfUrl;
+
+    // Upload course image to Cloudinary if present
+    if (courseImageFileObj) {
+      const localImagePath = courseImageFileObj.path || path.join(process.cwd(), "uploads", "courses", courseImageFileObj.filename);
+      try {
+        const uploaded = await uploadToCloudinary(localImagePath, "courses/images", "image");
+        courseImageUrl = uploaded.url; // store only URL string to match your schema
+        // If you later want to keep public_id, consider storing uploaded.public_id in another DB field
+      } catch (err) {
+        console.error("Image upload failed:", err);
+        // continue without image or handle as error
+      }
+    }
+
+    // Upload pdf to Cloudinary if present (resource_type auto/raw)
+    if (pdfFileObj) {
+      const localPdfPath = pdfFileObj.path || path.join(process.cwd(), "uploads", "courses", pdfFileObj.filename);
+      try {
+        // use resource_type 'auto' so cloudinary handles the pdf
+        const uploadedPdf = await uploadToCloudinary(localPdfPath, "courses/pdfs", "auto");
+        pdfUrl = uploadedPdf.url;
+      } catch (err) {
+        console.error("PDF upload failed:", err);
+      }
+    }
 
     const newCourse = new Course({
       name,
@@ -72,10 +148,8 @@ exports.addCourse = async (req, res) => {
       fees,
       topicCoverContent,
       topics: parsedTopics,
-      courseImage: courseImageFile
-        ? `/uploads/courses/${courseImageFile}`
-        : undefined,
-      pdf: pdfFile ? `/uploads/courses/${pdfFile}` : undefined,
+      courseImage: courseImageUrl || undefined,
+      pdf: pdfUrl || undefined,
       metaTitle,
       metaDescription,
       metaKeywords,
@@ -122,32 +196,68 @@ exports.updateCourse = async (req, res) => {
     const names = req.body.topicNames || [];
     const durations = req.body.topicDurations || [];
 
-    const parsedTopics = names.map((name, index) => ({
-      name,
+    const parsedTopics = names.map((tName, index) => ({
+      name: tName,
       duration: durations[index] || "",
     }));
 
     const course = await Course.findById(req.params.id);
     if (!course) return res.redirect("/admin-course?error=notfound");
 
-    // Replace files if new ones are uploaded
-    const courseImageFile = req.files?.courseImage?.[0]?.filename;
-    const pdfFile = req.files?.pdf?.[0]?.filename;
+    // New uploaded files (multer)
+    const courseImageFileObj = req.files?.courseImage?.[0];
+    const pdfFileObj = req.files?.pdf?.[0];
 
-    if (courseImageFile) {
-      if (course.courseImage) {
-        const oldImagePath = path.join(__dirname, "..", course.courseImage);
-        fs.existsSync(oldImagePath) && fs.unlinkSync(oldImagePath);
+    // If new course image uploaded -> upload to Cloudinary and store URL
+    if (courseImageFileObj) {
+      // If current stored course.courseImage is an object with public_id, delete from cloudinary
+      if (course.courseImage && typeof course.courseImage === "object" && course.courseImage.public_id) {
+        await deleteFromCloudinary(course.courseImage.public_id, course.courseImage.resource_type || "image");
+      } else if (course.courseImage && typeof course.courseImage === "string") {
+        // If it's a local path (starts with /uploads) delete local file
+        if (course.courseImage.startsWith("/uploads") || course.courseImage.startsWith("uploads")) {
+          const oldImagePath = path.join(__dirname, "..", course.courseImage);
+          try {
+            fs.existsSync(oldImagePath) && fs.unlinkSync(oldImagePath);
+          } catch (e) {
+            console.warn("Failed to delete old local course image:", e.message);
+          }
+        }
+        // If it's a Cloudinary URL string we can't extract public_id reliably; skip deletion
       }
-      course.courseImage = `/uploads/courses/${courseImageFile}`;
+
+      const localImagePath = courseImageFileObj.path || path.join(process.cwd(), "uploads", "courses", courseImageFileObj.filename);
+      try {
+        const uploaded = await uploadToCloudinary(localImagePath, "courses/images", "image");
+        // store only url string
+        course.courseImage = uploaded.url;
+      } catch (err) {
+        console.error("Image upload failed during update:", err);
+      }
     }
 
-    if (pdfFile) {
-      if (course.pdf) {
-        const oldPdfPath = path.join(__dirname, "..", course.pdf);
-        fs.existsSync(oldPdfPath) && fs.unlinkSync(oldPdfPath);
+    // If new pdf uploaded -> upload and store URL
+    if (pdfFileObj) {
+      if (course.pdf && typeof course.pdf === "object" && course.pdf.public_id) {
+        await deleteFromCloudinary(course.pdf.public_id, course.pdf.resource_type || "auto");
+      } else if (course.pdf && typeof course.pdf === "string") {
+        if (course.pdf.startsWith("/uploads") || course.pdf.startsWith("uploads")) {
+          const oldPdfPath = path.join(__dirname, "..", course.pdf);
+          try {
+            fs.existsSync(oldPdfPath) && fs.unlinkSync(oldPdfPath);
+          } catch (e) {
+            console.warn("Failed to delete old local pdf:", e.message);
+          }
+        }
       }
-      course.pdf = `/uploads/courses/${pdfFile}`;
+
+      const localPdfPath = pdfFileObj.path || path.join(process.cwd(), "uploads", "courses", pdfFileObj.filename);
+      try {
+        const uploadedPdf = await uploadToCloudinary(localPdfPath, "courses/pdfs", "auto");
+        course.pdf = uploadedPdf.url;
+      } catch (err) {
+        console.error("PDF upload failed during update:", err);
+      }
     }
 
     // Update fields
@@ -174,14 +284,26 @@ exports.deleteCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (course) {
-      // Delete course image and PDF
-      if (course.courseImage) {
-        const imagePath = path.join(__dirname, "..", course.courseImage);
-        fs.existsSync(imagePath) && fs.unlinkSync(imagePath);
+      // If course.courseImage stored as object with public_id, delete from Cloudinary
+      if (course.courseImage && typeof course.courseImage === "object" && course.courseImage.public_id) {
+        await deleteFromCloudinary(course.courseImage.public_id, course.courseImage.resource_type || "image");
+      } else if (course.courseImage && typeof course.courseImage === "string") {
+        // If local file path, delete local
+        if (course.courseImage.startsWith("/uploads") || course.courseImage.startsWith("uploads")) {
+          const imagePath = path.join(__dirname, "..", course.courseImage);
+          fs.existsSync(imagePath) && fs.unlinkSync(imagePath);
+        }
+        // If it's a cloud URL string, can't delete without public_id
       }
-      if (course.pdf) {
-        const pdfPath = path.join(__dirname, "..", course.pdf);
-        fs.existsSync(pdfPath) && fs.unlinkSync(pdfPath);
+
+      // If course.pdf stored as object with public_id, delete from Cloudinary
+      if (course.pdf && typeof course.pdf === "object" && course.pdf.public_id) {
+        await deleteFromCloudinary(course.pdf.public_id, course.pdf.resource_type || "auto");
+      } else if (course.pdf && typeof course.pdf === "string") {
+        if (course.pdf.startsWith("/uploads") || course.pdf.startsWith("uploads")) {
+          const pdfPath = path.join(__dirname, "..", course.pdf);
+          fs.existsSync(pdfPath) && fs.unlinkSync(pdfPath);
+        }
       }
 
       await Course.findByIdAndDelete(req.params.id);

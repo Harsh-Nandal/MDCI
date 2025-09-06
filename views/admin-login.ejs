@@ -71,7 +71,7 @@
     <div class="row auth-row position-relative">
       <a href="/" class="auth_logo">
         <img
-          src="/images/Maharishi Dayanad Computer Institute footer.svg"
+          src="<%= headerImageUrl %>"
           alt="Maharishi Dayanad Computer Institute"
         />
       </a>
@@ -85,7 +85,9 @@
             />
           </div>
           <h1 class="text-center">
-            <span class="text-white">Skill badhao, career banao! Desinerz Academy</span>
+            <span class="text-white"
+              >Skill badhao, career banao! Desinerz Academy</span
+            >
           </h1>
           <div class="banner_listing p-0 mt-3">
             <div class="banner_list-item">
@@ -155,19 +157,19 @@
         </div>
       </div>
       <div class="col-md-6 d-flex align-items-center justify-content-center">
-        <div class="contact-form auth-form w-100 px-4" style="max-width: 100%; ">
+        <div class="contact-form auth-form w-100 px-4" style="max-width: 100%">
           <div class="auth-heading text-center mb-4">
             <h3 class="font-lora fw-bold">
               Sign up <span class="text-primary">Desinerz Academy</span>
             </h3>
           </div>
 
-          <form action="/admin/login" method="post" style="width: 100%;">
+          <form action="/admin/login" method="post" style="width: 100%">
             <!-- Username -->
             <div class="mb-4">
               <label for="fname" class="form-label fw-semibold">Name</label>
               <div class="position-relative">
-                <input  
+                <input
                   type="text"
                   class="form-control ps-5 py-3 rounded"
                   id="fname"
@@ -212,8 +214,12 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="d-grid" style="width: 100%;text-align: center;">
-              <button type="submit" class="btn btn-primary py-2 rounded-pill" style="width: 300px;">
+            <div class="d-grid" style="width: 100%; text-align: center">
+              <button
+                type="submit"
+                class="btn btn-primary py-2 rounded-pill"
+                style="width: 300px"
+              >
                 Sign In
               </button>
             </div>
