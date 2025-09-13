@@ -172,7 +172,6 @@ button:hover,
   max-width: 85rem;
 }
 
-
 .page-wrapper {
   margin-top: 120px;
 }
@@ -296,7 +295,7 @@ section.ad_banner p {
 .footer_top-left {
   gap: 32px;
 }
-.footer_top-left img{
+.footer_top-left img {
   width: 18rem;
 }
 
@@ -898,7 +897,6 @@ a.btn-view.btn_border {
 
 .moments {
   padding: 127px 0px 38px;
-  
 }
 
 /* span.swiper-pagination-bullet {
@@ -1038,7 +1036,6 @@ section.testimonials
 section.testimonials {
   background: #f1f6ff;
   padding: 80px 0px 85px 0px;
-  
 }
 
 .home_contact-header h5 {
@@ -1801,7 +1798,6 @@ section.bg_banner.is_breadcrumb {
 .is_breadcrumb ul li {
   color: #ffffffc2;
 }
-
 
 .is_breadcrumb ul li.active {
   color: #fff !important;
@@ -2645,18 +2641,16 @@ img.fade_logo {
   justify-content: flex-start;
   align-items: flex-end;
   width: 100%;
-  
-  
 }
 
-.card-header button:hover{
+.card-header button:hover {
   background-color: #dbe1ee;
 }
-.contact_map iframe{
-width: 90%;
-margin-left: 5%;
+.contact_map iframe {
+  width: 90%;
+  margin-left: 5%;
 }
-.setting-height-courses{
+.setting-height-courses {
   margin-top: -2rem;
 }
 
@@ -2758,7 +2752,7 @@ margin-left: 5%;
   }
   .is_breadcrumb ul {
     flex-wrap: wrap;
-    
+
     text-align: center;
     /* justify-content: center; */
   }
@@ -3748,65 +3742,58 @@ margin-left: 5%;
   }
 }
 
-
-
-@media only screen and (min-width: 992px) and (max-width: 1200px ) {
-  .button-hamburger{
+@media only screen and (min-width: 992px) and (max-width: 1200px) {
+  .button-hamburger {
     display: block;
   }
 }
 
-
-@media only screen and (min-width: 353px) and (max-width: 535px ) {
+@media only screen and (min-width: 353px) and (max-width: 535px) {
   .page-wrapper {
     margin-top: 142px;
   }
 }
-@media only screen and (min-width: 535px) and (max-width: 768px ) {
+@media only screen and (min-width: 535px) and (max-width: 768px) {
   .page-wrapper {
     margin-top: 131px;
   }
 }
-@media only screen and (min-width: 768px) and (max-width: 994px ) {
-	.page-wrapper {
+@media only screen and (min-width: 768px) and (max-width: 994px) {
+  .page-wrapper {
     margin-top: 170px;
   }
-  .header-list-item{
-  margin-top: 5rem;
+  .header-list-item {
+    margin-top: 5rem;
+  }
 }
+@media only screen and (min-width: 768px) and (max-width: 1025px) {
+  .header-red-button {
+    margin-right: 220px;
+  }
 }
-@media only screen and (min-width: 768px) and (max-width: 1025px ) {
-	.header-red-button{
-  margin-right: 220px;
-}
-
-}
-@media only screen and (min-width: 995px) and (max-width: 1117px ) {
-	.page-wrapper {
+@media only screen and (min-width: 995px) and (max-width: 1117px) {
+  .page-wrapper {
     margin-top: 160px;
   }
 }
-@media only screen and (min-width: 1118px) and (max-width: 1297px ) {
-	.page-wrapper {
+@media only screen and (min-width: 1118px) and (max-width: 1297px) {
+  .page-wrapper {
     margin-top: 158px;
   }
 }
-@media only screen and (min-width: 1297px)  {
-	.page-wrapper {
+@media only screen and (min-width: 1297px) {
+  .page-wrapper {
     margin-top: 136px;
   }
 }
-@media only screen and (min-width: 1200px) and (max-width: 1297px ) {
-	
-  .iframe-video-tag{
-	width: 520px;
-
+@media only screen and (min-width: 1200px) and (max-width: 1297px) {
+  .iframe-video-tag {
+    width: 520px;
   }
 }
 @media (min-width: 1024px) and (max-width: 1199.98px) {
-      .mt-lg-xl {
-        margin-top: 2rem; /* You can change this value */
-      }
-    }
-
+  .mt-lg-xl {
+    margin-top: 2rem; /* You can change this value */
+  }
+}
 

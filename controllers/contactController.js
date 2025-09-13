@@ -1,14 +1,13 @@
 // ===========================
-// contactController.js (Final Fixed)
+// contactController.js (Final Fixed with Cloudinary)
 // ===========================
 
 const ContactSection = require("../models/ContactSection");
-const fs = require("fs");
-const path = require("path");
 const Content = require("../models/Content");
 const SiteConfig = require("../models/SiteConfig");
+const cloudinary = require("../config/cloudinary"); // ✅ Cloudinary config
 
-exports.getContactSection = async (req, res) => {
+exports.getContactSection = async (req, res, next) => {
   try {
     const [
       siteConfig,
@@ -43,7 +42,7 @@ exports.getContactSection = async (req, res) => {
   }
 };
 
-exports.getAdminContactSection = async (req, res) => {
+exports.getAdminContactSection = async (req, res, next) => {
   try {
     const [
       siteConfig,
@@ -71,41 +70,39 @@ exports.getAdminContactSection = async (req, res) => {
       currentPath: req.path,
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
-
-
-exports.postContactSection = async (req, res) => {
+exports.postContactSection = async (req, res, next) => {
   const { id = [], name = [], heading = [], content = [] } = req.body;
 
   try {
     for (let i = 0; i < 3; i++) {
-      // ✅ Only check required fields: heading and content
       if (!heading[i] || !content[i]) continue;
 
       const imageFile = req.files[`image${i}`]?.[0]; // May be undefined
-      const imagePath = imageFile
-        ? `/uploads/contact/${imageFile.filename}`
-        : undefined;
+      let imageUrl;
+
+      if (imageFile) {
+        // ✅ Upload file buffer to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(imageFile.path, {
+          folder: "contact", // Cloudinary folder name
+        });
+        imageUrl = uploadResult.secure_url;
+      }
 
       const updateData = {
-        name: name[i] || `Section ${i + 1}`, // fallback if name is missing
+        name: name[i] || `Section ${i + 1}`,
         heading: heading[i],
         content: content[i],
       };
 
-      if (imagePath) {
-        updateData.imagePath = imagePath;
+      if (imageUrl) {
+        updateData.imagePath = imageUrl; // Save Cloudinary URL instead of local path
       }
 
       if (id[i]) {
-        const oldDoc = await ContactSection.findById(id[i]);
-        if (oldDoc?.imagePath && imagePath && oldDoc.imagePath !== imagePath) {
-          const fullPath = path.join(__dirname, "..", oldDoc.imagePath);
-          if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
-        }
         await ContactSection.findByIdAndUpdate(id[i], updateData);
       } else {
         await new ContactSection(updateData).save();
@@ -114,6 +111,6 @@ exports.postContactSection = async (req, res) => {
 
     res.redirect("/admin-contact");
   } catch (err) {
-    next(err)
+    next(err);
   }
 };

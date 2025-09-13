@@ -34,7 +34,7 @@ if (!fs.existsSync(uploadPath)) {
 // default footer image (served from /public)
 app.use((req, res, next) => {
   res.locals.footerImageUrl =
-    res.locals.footerImageUrl || "/Desinerz Academy_Light.png";
+    res.locals.footerImageUrl || "/Desinerz_academy_light.png";
   next();
 });
 
