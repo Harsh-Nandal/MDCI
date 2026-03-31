@@ -3,17 +3,15 @@
   <head>
     <title>Select Student</title>
     <%- include("../partials/head") %>
-    
+
     <script>
       let allRows = [];
 
       function initStudentTable() {
-        // Save all rows into JS array
         allRows = Array.from(
           document.querySelectorAll("#studentTable tbody tr")
         );
 
-        // Show only first 20
         allRows.forEach((row, i) => {
           row.style.display = i < 20 ? "" : "none";
         });
@@ -43,50 +41,30 @@
 
   <body class="p-4">
     <%- include('../partials/sidebar') %>
+
     <div class="dashboard-main-wrapper">
-      <div
-        class="top-navbar flex-between gap-16"
-        style="background-color: rgb(254, 254, 254)"
-      >
+      <div class="top-navbar flex-between gap-16" style="background-color:#fff">
         <div class="flex-align gap-16">
-          <!-- Toggle Button Start -->
-          <button
-            type="button"
-            class="toggle-btn d-xl-none d-flex text-26 text-gray-500"
-          >
+          <button type="button" class="toggle-btn d-xl-none d-flex text-26 text-gray-500">
             <i class="ph ph-list"></i>
           </button>
-          <!-- Toggle Button End -->
-
           <h1>Student Certificate</h1>
         </div>
 
-        <div class="flex-align gap-16">
-          <a
-            href="/admin/logout"
-            class="py-12 text-15 px-20 hover-bg-danger-50 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium text-15"
-          >
-            <span class="text-2xl text-danger-600 d-flex"
-              ><i class="ph ph-sign-out"></i
-            ></span>
-            <span class="text">Log Out</span>
-          </a>
-        </div>
+        <a href="/admin/logout" class="py-12 px-20 text-gray-300 hover-text-danger-600 rounded-8 flex-align gap-8 fw-medium">
+          <i class="ph ph-sign-out text-danger-600"></i> Logout
+        </a>
       </div>
-      <!-- Body Content Starts here  -->
 
-      <!-- Toggle Button -->
-      <div class="button-content" style="text-align: center; width: 100%">
-        <button
-          onclick="toggleStudentSection()"
-          class="btn btn-primary mb-3"
-          style="width: 400px; margin: 1rem; text-align: center"
-        >
+      <!-- TOGGLE BUTTON -->
+      <div style="text-align:center;">
+        <button onclick="toggleStudentSection()" class="btn btn-primary mb-3" style="width:400px;">
           Toggle Student Selection
         </button>
       </div>
-      <!-- STUDENT SEARCH & SELECT (toggleable section) -->
-      <div id="studentSection" style="display: none">
+
+      <!-- ✅ CORRECT STUDENT TABLE -->
+      <div id="studentSection" style="display:none">
         <input
           type="text"
           id="searchInput"
@@ -104,21 +82,19 @@
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
             <% students.forEach(student => { %>
-            <tr>
-              <td><%= student.name %></td>
-              <td><%= student.email %></td>
-              <td><%= student.course.name %></td>
-              <td>
-                <a
-                  href="/admin/marks/form/<%= student._id %>"
-                  class="btn btn-outline-primary btn-sm"
-                >
-                  Open Form
-                </a>
-              </td>
-            </tr>
+              <tr>
+                <td><%= student.name || "N/A" %></td>
+                <td><%= student.email || "N/A" %></td>
+                <td><%= student.course?.name || "N/A" %></td>
+                <td>
+                  <a href="/admin/marks/form/<%= student._id %>" class="btn btn-outline-primary btn-sm">
+                    Open Form
+                  </a>
+                </td>
+              </tr>
             <% }) %>
           </tbody>
         </table>
@@ -126,9 +102,9 @@
         <hr class="my-5" />
       </div>
 
-      <!-- CERTIFICATE LIST -->
+      <!-- ✅ CERTIFICATE TABLE -->
       <h3>Students with Certificates</h3>
-      <!-- Table Container -->
+
       <div class="table-responsive p-3">
         <table class="table table-bordered table-hover shadow-sm rounded">
           <thead class="table-primary text-center">
@@ -141,39 +117,45 @@
               <th>Marksheet</th>
             </tr>
           </thead>
-          <tbody class="align-middle text-center">
+
+          <tbody class="text-center">
             <% issuedStudents.forEach(entry => { %>
-            <tr>
-              <td><%= entry.student.name %></td>
-              <td><%= entry.student.course.name %></td>
-              <td><%= entry.certificateNo %></td>
-              <td><%= new Date(entry.issueDate).toLocaleDateString() %></td>
-              <td>
-                <a
-                  href="/admin/marks/certificate/<%= entry._id %>"
-                  target="_blank"
-                  class="btn btn-success btn-sm"
-                >
-                  View Certificate
-                </a>
-              </td>
-              <td>
-                <a
-                  href="/admin/marks/marksheet/<%= entry._id %>"
-                  target="_blank"
-                  class="btn btn-info btn-sm"
-                >
-                  View Marksheet
-                </a>
-              </td>
-            </tr>
+              <tr>
+                <td><%= entry.student?.name || "N/A" %></td>
+                <td><%= entry.student?.course?.name || "N/A" %></td>
+                <td><%= entry.certificateNo || "N/A" %></td>
+                <td>
+                  <%= entry.issueDate
+                    ? new Date(entry.issueDate).toLocaleDateString()
+                    : "N/A" %>
+                </td>
+
+                <td>
+                  <% if(entry.student) { %>
+                    <a href="/admin/marks/certificate/<%= entry._id %>" target="_blank" class="btn btn-success btn-sm">
+                      View
+                    </a>
+                  <% } else { %>
+                    <span class="text-danger">Invalid</span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <% if(entry.student) { %>
+                    <a href="/admin/marks/marksheet/<%= entry._id %>" target="_blank" class="btn btn-info btn-sm">
+                      View
+                    </a>
+                  <% } else { %>
+                    <span class="text-danger">Invalid</span>
+                  <% } %>
+                </td>
+              </tr>
             <% }) %>
           </tbody>
         </table>
       </div>
 
       <script>
-        // Run table limit only when page is loaded
         window.addEventListener("DOMContentLoaded", () => {
           const section = document.getElementById("studentSection");
           if (section.style.display === "block") initStudentTable();
