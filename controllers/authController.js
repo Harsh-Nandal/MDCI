@@ -69,13 +69,18 @@ const getStudentLogin = async (req, res) => {
   });
 };
 
-const postStudentLogin = async (req, res) => {
+const postStudentLogin = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const student = await Student.findOne({ email });
+    const student = await Student.findOne({
+      email: email.trim().toLowerCase(),
+    });
 
-    const isMatch = student ? await student.matchPassword(password) : false;
+    console.log("Student:", student);
+
+    // TEMP FIX (if password not hashed)
+    const isMatch = student ? password === student.password : false;
 
     if (!student || !isMatch) {
       const headerImageUrl = await getHeaderImage();
@@ -90,10 +95,10 @@ const postStudentLogin = async (req, res) => {
       id: student._id,
       email: student.email,
     };
-    console.log("✅ Redirecting to dashboard...");
+
     res.redirect("/student/dashboard");
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
