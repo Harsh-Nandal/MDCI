@@ -206,9 +206,9 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start server (PORT from env, bind to 0.0.0.0)
-app.listen(PORT,HOST,  () => {
-  console.log(`✅ Server running at http://${HOST}:${PORT}`);
-});
-// app.listen(PORT,  () => {
-//   console.log(`✅ Server running at http://localhost:${PORT}`);
+// app.listen(PORT,HOST,  () => {
+//   console.log(`✅ Server running at http://${HOST}:${PORT}`);
 // });
+app.listen(PORT,  () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
